@@ -5,14 +5,14 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
+  {
+    rules: {
+      // Les captures ja es serveixen optimitzades (WebP + miniatura) des de Supabase Storage.
+      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "lib/supabase/database.types.ts", "mcp-server/dist/**"]),
 ]);
 
 export default eslintConfig;

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { MobileHeader, MobileNav } from "@/components/layout/mobile-nav";
+import { MobileNavSkeleton, SidebarSkeleton } from "@/components/layout/nav-skeleton";
 import { Sidebar } from "@/components/layout/sidebar";
 import { countUnreadReports } from "@/features/market-reports/queries";
 
@@ -20,7 +21,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <a href="#contingut" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-white">
         Salta al contingut
       </a>
-      <Suspense fallback={<Sidebar initialCollapsed={false} unreadReports={0} />}>
+      <Suspense fallback={<SidebarSkeleton />}>
         <SidebarWithState />
       </Suspense>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -29,7 +30,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
       </div>
-      <Suspense fallback={<MobileNav unreadReports={0} />}>
+      <Suspense fallback={<MobileNavSkeleton />}>
         <MobileNavWithState />
       </Suspense>
     </div>

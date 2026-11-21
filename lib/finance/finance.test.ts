@@ -160,3 +160,28 @@ describe("checkDiscipline", () => {
     expect(checkDiscipline({ maxDailyLoss: null, maxWeeklyLoss: null, maxTradesPerDay: null }, { todayPnl: -100, weekPnl: -100, tradesToday: 50 })).toEqual([]);
   });
 });
+
+import { riskOfRuin } from ".";
+
+describe("riskOfRuin", () => {
+  it("esperança negativa → ruïna gairebé segura", () => {
+    const r = riskOfRuin({ winRate: 30, rewardRisk: 1.5, ruinR: 20 });
+    expect(r.expectancyR).toBe(-0.25);
+    expect(r.probability).toBeGreaterThan(95);
+    expect(r.verdict).toBe("critical");
+  });
+  it("esperança clarament positiva → risc molt baix", () => {
+    const r = riskOfRuin({ winRate: 50, rewardRisk: 2, ruinR: 20 });
+    expect(r.expectancyR).toBe(0.5);
+    expect(r.probability).toBeLessThan(1);
+    expect(r.verdict).toBe("bulletproof");
+  });
+  it("un llindar de ruïna més ajustat augmenta el risc", () => {
+    const tight = riskOfRuin({ winRate: 45, rewardRisk: 1.5, ruinR: 5 });
+    const loose = riskOfRuin({ winRate: 45, rewardRisk: 1.5, ruinR: 30 });
+    expect(tight.probability).toBeGreaterThan(loose.probability);
+  });
+  it("és determinista", () => {
+    expect(riskOfRuin({ winRate: 40, rewardRisk: 1.6, ruinR: 10 })).toEqual(riskOfRuin({ winRate: 40, rewardRisk: 1.6, ruinR: 10 }));
+  });
+});

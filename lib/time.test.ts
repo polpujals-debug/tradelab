@@ -14,3 +14,14 @@ describe("dates a Europe/Madrid", () => {
     expect(startOfWeek("2026-11-16")).toBe("2026-11-16");
   });
 });
+
+import { isoToLocalInput, localInputToIso } from "./time";
+
+describe("inputs datetime-local", () => {
+  it("converteix hora de Madrid a UTC i tornada (hivern i estiu)", () => {
+    expect(localInputToIso("2026-11-21T10:30")).toBe("2026-11-21T09:30:00.000Z");
+    expect(localInputToIso("2026-07-01T10:30")).toBe("2026-07-01T08:30:00.000Z");
+    expect(isoToLocalInput("2026-11-21T09:30:00.000Z")).toBe("2026-11-21T10:30");
+    expect(isoToLocalInput("2026-07-01T08:30:00Z")).toBe("2026-07-01T10:30");
+  });
+});

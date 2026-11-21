@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "seed:generate": "tsx scripts/generate-seed.ts"
+    "seed:generate": "tsx scripts/generate-seed.ts",
+    "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.4.1",
