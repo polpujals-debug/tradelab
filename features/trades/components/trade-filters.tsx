@@ -24,7 +24,7 @@ export function TradeFilters({ assets, setups, tags }: { assets: string[]; setup
 
   const sel = "h-9 text-xs";
   return (
-    <div className={cn("mb-4 flex flex-wrap items-center gap-2 transition-opacity", pending && "opacity-60")}>
+    <div className={cn("-mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 transition-opacity sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0", pending && "opacity-60")}>
       <NativeSelect aria-label="Actiu" className={cn(sel, "w-32")} value={v("asset")} onChange={(e) => set("asset", e.target.value)}>
         <option value="">Tots els actius</option>
         {assets.map((a) => <option key={a} value={a}>{a}</option>)}

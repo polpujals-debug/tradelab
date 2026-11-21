@@ -20,6 +20,9 @@ const rnd = mulberry32(20261121);
 const pick = <T,>(arr: readonly T[]): T => arr[Math.floor(rnd() * arr.length)];
 const q = (v: string | null | undefined) => (v == null ? "null" : `'${v.replace(/'/g, "''")}'`);
 const ago = (minutes: number) => `now() - interval '${Math.round(minutes)} minutes'`;
+/** Instant a una hora local de Madrid (minuts des de mitjanit) fa `days` dies, mai més tard que fa `capMin` minuts. */
+const madridAt = (days: number, minuteOfDay: number, capMin = 5) =>
+  `least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '${days} days' + interval '${Math.round(minuteOfDay)} minutes') at time zone 'Europe/Madrid', now() - interval '${Math.round(capMin)} minutes')`;
 const arr = (v: string[]) => `array[${v.map(q).join(",")}]::text[]`;
 let uuidCounter = 0;
 const uuid = (prefix: string) => {
@@ -291,8 +294,10 @@ for (const daysAgo of activeDays) {
     else r = uniqErrors.includes("Moure el SL") ? -(1.3 + rnd() * 0.5) : -1;
     const exit = round(price + sign * riskPerUnit * r, a.digits);
     const fees = round(qty * price * 0.0002 * 2, 4);
-    const entryMinutes = daysAgo * 1440 + 540 + k * 110 + rnd() * 80;
+    const startMin = 9 * 60 + 15 + k * 170 + rnd() * 110; // 09:15–18:00 hora de Madrid
     const duration = 12 + rnd() * 70;
+    const entryTs = madridAt(daysAgo, startMin, 5 + duration + (n - k) * 90);
+    const exitTs = madridAt(daysAgo, startMin + duration, 5 + (n - k - 1) * 90);
     const isOpenToday = daysAgo === 0 && k === n - 1;
     const pnl = calcTradePnl({ direction, entry: price, exit, stop, quantity: qty, fees, capitalAtEntry: capital });
     const id = uuid("10000000");
@@ -311,25 +316,25 @@ for (const daysAgo of activeDays) {
     const analysis = analyses.find((x) => x.sym === sym && Math.abs(x.daysAgo - daysAgo) <= 1);
     const status = isOpenToday ? "open" : "closed";
     tradeRows.push(`  ('${id}', '${ACCOUNT}', '${a.id}', '${strategy}', ${analysis ? `'${analysis.id}'` : "null"}, '${direction}', '${status}',
-   ${ago(entryMinutes)}, ${status === "closed" ? ago(entryMinutes - duration) : "null"}, ${price}, ${stop}, ${tp}, ${status === "closed" ? exit : "null"},
+   ${entryTs}, ${status === "closed" ? exitTs : "null"}, ${price}, ${stop}, ${tp}, ${status === "closed" ? exit : "null"},
    ${qty}, ${round(Math.max(1, Math.ceil((qty * price) / capital)), 0)}, ${status === "closed" ? fees : 0}, ${round(capital, 2)},
    '${direction === "long" ? "bullish" : "bearish"}', ${q(pick(confirmations))}, ${q(pick(triggers))}, ${q(setup)},
    ${q(emotionB)}, ${status === "closed" ? q(emotionA) : "null"},
    ${q(hasError ? `Vaig entrar amb ${uniqErrors.join(" i ").toLowerCase()}. ${r < 0 ? "El mercat no em va donar la raó." : "Va sortir bé però no per les raons correctes."}` : r > 0 ? "Setup de manual: biaix, estructura i gatell alineats." : "Bona execució; el mercat simplement no hi va arribar.")},
-   ${status === "closed" ? q(pick(lessons)) : "null"}, ${ago(entryMinutes)})`);
+   ${status === "closed" ? q(pick(lessons)) : "null"}, ${entryTs})`);
 
     if (tradeIndex % 4 === 0 || isOpenToday) {
       const before = image(`trade_${tradeIndex}_before`, {
         symbol: sym, timeframe: "5m", startPrice: price * (1 - sign * 0.03), volatility: a.vol * 0.8, drift: sign * 0.0004,
         seed: 5000 + tradeIndex, candles: 90, marker: { index: 88, direction, stop, target: tp },
       });
-      mediaRows.push(`  ('trade', '${id}', 'before', '${before.url}', '${before.thumb}', 'image/webp', 1280, 720, 'Pla a 5m', 0, ${ago(entryMinutes)})`);
+      mediaRows.push(`  ('trade', '${id}', 'before', '${before.url}', '${before.thumb}', 'image/webp', 1280, 720, 'Pla a 5m', 0, ${entryTs})`);
       if (status === "closed") {
         const after = image(`trade_${tradeIndex}_after`, {
           symbol: sym, timeframe: "5m", startPrice: price * (1 - sign * 0.03), volatility: a.vol * 0.8, drift: sign * 0.0004 * (r > 0 ? 1.4 : -0.6),
           seed: 5000 + tradeIndex, candles: 120, marker: { index: 88, direction, stop, target: tp },
         });
-        mediaRows.push(`  ('trade', '${id}', 'after', '${after.url}', '${after.thumb}', 'image/webp', 1280, 720, 'Resultat', 1, ${ago(entryMinutes - duration)})`);
+        mediaRows.push(`  ('trade', '${id}', 'after', '${after.url}', '${after.thumb}', 'image/webp', 1280, 720, 'Resultat', 1, ${exitTs})`);
       }
     }
 

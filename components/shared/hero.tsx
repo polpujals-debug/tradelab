@@ -19,8 +19,8 @@ export function Hero({ icon: Icon, eyebrow, title, description, actions, childre
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(30_41_59/0.35)_1px,transparent_1px)] bg-[size:48px_100%] [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
       <div aria-hidden className="pointer-events-none absolute -top-24 left-1/4 h-48 w-1/2 rounded-full bg-primary/15 blur-3xl" />
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="grid size-12 shrink-0 place-items-center rounded-2xl border border-primary/35 bg-primary/10 shadow-[0_0_24px_-6px_rgb(59_130_246/0.6)]">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="grid size-10 shrink-0 place-items-center rounded-xl sm:size-12 sm:rounded-2xl border border-primary/35 bg-primary/10 shadow-[0_0_24px_-6px_rgb(59_130_246/0.6)]">
             <Icon className="size-5 text-accent" />
           </div>
           <div className="min-w-0">
