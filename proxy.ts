@@ -46,6 +46,7 @@ h1{font-size:18px;margin:0 0 8px}p{color:#94a3b8;font-size:14px;line-height:1.6;
 }
 
 export const config = {
-  // L'API (/api/v1) té les seves pròpies claus; els fitxers estàtics no es protegeixen.
-  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico|seed/).*)"],
+  // L'API (/api/v1) té les seves pròpies claus; els fitxers estàtics, les icones i el manifest
+  // (necessaris per instal·lar l'app) no es protegeixen.
+  matcher: ["/((?!api/|_next/static|_next/image|seed/|icons/|manifest.webmanifest|icon.png|apple-icon.png).*)"],
 };

@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: { default: "TradeLab", template: "%s · TradeLab" },
   description: "Plataforma personal de trading, anàlisi i aprenentatge.",
   robots: { index: false, follow: false },
+  appleWebApp: { capable: true, title: "TradeLab", statusBarStyle: "black-translucent" },
+  applicationName: "TradeLab",
 };
 
 export const viewport: Viewport = {

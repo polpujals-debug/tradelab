@@ -131,6 +131,27 @@ Obre http://localhost:3000. Per crear una clau d'API: **Configuració → Claus 
 
 > Al pla gratuït de Vercel, el cos d'una petició no pot superar els **4,5 MB**. Les captures del formulari web es comprimeixen al navegador. Per API, les captures molt grans s'han d'enviar per `url` o pujar abans a `/uploads` (el servidor MCP ja ho fa sol).
 
+## Instal·lar-la com una app (mòbil i ordinador)
+
+TradeLab és una PWA: un cop oberta (amb l'enllaç d'accés), es pot instal·lar amb la seva icona.
+
+- **iPhone (Safari):** botó Compartir → *Afegeix a la pantalla d'inici*.
+- **Android (Chrome):** menú ⋮ → *Instal·la l'aplicació*.
+- **Ordinador (Chrome o Edge):** icona d'instal·lar a la barra d'adreces (o menú → *Instal·la TradeLab*).
+
+## Fer-la córrer només al teu ordinador (sense Vercel)
+
+```bash
+npm install
+```
+
+```bash
+npm run start:local
+```
+
+Amb `.env.local` apuntant al teu Supabase. S'obre a http://localhost:3000 i, des del mòbil **a la mateixa wifi**, a `http://<IP-de-l'ordinador>:3000`.
+Limitacions: l'ordinador ha d'estar encès; el mòbil només hi arriba des de casa; i **la tasca programada de Claude (que s'executa a internet) no hi pot enviar informes**. Les anàlisis des de **Claude Desktop amb el servidor MCP** sí que funcionen (`TRADELAB_URL=http://localhost:3000`).
+
 ## Scripts
 
 | Script | Què fa |

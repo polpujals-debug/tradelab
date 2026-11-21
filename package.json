@@ -15,7 +15,9 @@
     "seed:generate": "tsx scripts/generate-seed.ts",
     "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "apikey:create": "tsx --env-file=.env.local scripts/create-api-key.ts",
-    "docs:generate": "tsx scripts/generate-docs.ts"
+    "docs:generate": "tsx scripts/generate-docs.ts",
+    "icons:generate": "tsx scripts/generate-icons.ts",
+    "start:local": "next build && next start -H 0.0.0.0 -p 3000"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.4.1",
