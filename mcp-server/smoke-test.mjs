@@ -1,0 +1,20 @@
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
+const transport = new StdioClientTransport({ command: "node", args: ["dist/index.js"], env: { ...process.env } });
+const client = new Client({ name: "test", version: "1.0.0" });
+await client.connect(transport);
+const { tools } = await client.listTools();
+console.log("TOOLS:", tools.map((t) => t.name).join(", "));
+const show = (name, r) => console.log(`\n## ${name}${r.isError ? " (ERROR)" : ""}\n` + r.content.map((c) => c.text).join("\n").slice(0, 300));
+show("get_strategy", await client.callTool({ name: "get_strategy", arguments: {} }));
+show("save_analysis", await client.callTool({ name: "save_analysis", arguments: { asset: "ETH/USDT", timeframes: ["1H", "5m"], bias: "bearish", content_md: "### Què veig\n- Preu per sota de la MA50 a 1H.", scenario: "Caiguda cap a 3.050", resistances: [3180], supports: [3050], ma50: 3165, image_paths: ["../public/seed/analysis_6.webp"] } }));
+const lt = await client.callTool({ name: "log_trade", arguments: { asset: "BTC/USDT", entry_price: 92000, stop_loss: 91600, take_profit: 92900, risk_pct: 1.5, errors: ["FOMO"], setup: "Retrocés a MA50" } });
+show("log_trade", lt);
+const id = lt.content[0].text.match(/id: ([0-9a-f-]{36})/)[1];
+show("close_trade", await client.callTool({ name: "close_trade", arguments: { id, exit_price: 92800, lesson: "Paciència" } }));
+show("publish_market_report", await client.callTool({ name: "publish_market_report", arguments: { type: "daily", title: "Informe MCP", content_md: "## Resum\nMercat tranquil, BTC per sobre de la MA50.", report_date: "2026-11-22", btc_bias: "bullish" } }));
+show("publish_market_report (2a)", await client.callTool({ name: "publish_market_report", arguments: { type: "daily", title: "Informe MCP", content_md: "## Resum\nMercat tranquil, BTC per sobre de la MA50.", report_date: "2026-11-22", btc_bias: "bullish" } }));
+show("get_stats", await client.callTool({ name: "get_stats", arguments: { period: "week" } }));
+show("close_trade invalid", await client.callTool({ name: "close_trade", arguments: { id: "00000000-0000-4000-8000-000000000000", exit_price: 1 } }));
+await client.close();

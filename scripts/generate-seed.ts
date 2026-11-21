@@ -249,8 +249,15 @@ let capital = 150;
 
 // Dies amb activitat (dies enrere). Els darrers 7 dies seguits per tenir ratxa.
 const activeDays = [41, 40, 38, 37, 36, 34, 33, 31, 30, 29, 27, 26, 24, 23, 22, 20, 19, 17, 16, 15, 13, 12, 10, 9, 8, 6, 5, 4, 3, 2, 1, 0];
-const triggers = ["Trencament del mínim del retrocés", "Espelma envolvent a 1m", "Rebuig amb metxa llarga a 1m", "Trencament de la línia de tendència de 1m"];
-const confirmations = ["Màxims i mínims creixents a 5m", "Impuls + retrocés al 50 %", "Ruptura d'estructura (BOS) a 5m", "Mínims decreixents a 5m"];
+// Mateixa longitud per direcció (4) perquè la seqüència aleatòria no canviï
+const triggers = {
+  long: ["Trencament del màxim del retrocés a 1m", "Espelma envolvent alcista a 1m", "Rebuig amb metxa inferior llarga a 1m", "Trencament de la línia de tendència baixista de 1m"],
+  short: ["Trencament del mínim del retrocés a 1m", "Espelma envolvent baixista a 1m", "Rebuig amb metxa superior llarga a 1m", "Trencament de la línia de tendència alcista de 1m"],
+};
+const confirmations = {
+  long: ["Màxims i mínims creixents a 5m", "Impuls alcista + retrocés al 50 %", "Ruptura d'estructura alcista (BOS) a 5m", "Retrocés a la MA50 de 5m amb mínim més alt"],
+  short: ["Màxims i mínims decreixents a 5m", "Impuls baixista + retrocés al 50 %", "Ruptura d'estructura baixista (BOS) a 5m", "Retrocés a la MA50 de 5m amb màxim més baix"],
+};
 const lessons = [
   "Esperar el retrocés: entrar en ple impuls em deixa l'SL massa lluny.",
   "Si el biaix de 1H no és clar, no hi ha operació.",
@@ -320,7 +327,7 @@ for (const daysAgo of activeDays) {
     tradeRows.push(`  ('${id}', '${ACCOUNT}', '${a.id}', '${strategy}', ${analysis ? `'${analysis.id}'` : "null"}, '${direction}', '${status}',
    ${entryTs}, ${status === "closed" ? exitTs : "null"}, ${price}, ${stop}, ${tp}, ${status === "closed" ? exit : "null"},
    ${qty}, ${round(Math.max(1, Math.ceil((qty * price) / capital)), 0)}, ${status === "closed" ? fees : 0}, ${round(capital, 2)},
-   '${direction === "long" ? "bullish" : "bearish"}', ${q(pick(confirmations))}, ${q(pick(triggers))}, ${q(setup)},
+   '${direction === "long" ? "bullish" : "bearish"}', ${q(pick(confirmations[direction]))}, ${q(pick(triggers[direction]))}, ${q(setup)},
    ${q(emotionB)}, ${status === "closed" ? q(emotionA) : "null"},
    ${q(hasError ? `Vaig entrar amb ${uniqErrors.join(" i ").toLowerCase()}. ${r < 0 ? "El mercat no em va donar la raó." : "Va sortir bé però no per les raons correctes."}` : r > 0 ? "Setup de manual: biaix, estructura i gatell alineats." : "Bona execució; el mercat simplement no hi va arribar.")},
    ${status === "closed" ? q(pick(lessons)) : "null"}, ${entryTs})`);

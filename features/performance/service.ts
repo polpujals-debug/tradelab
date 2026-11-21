@@ -72,7 +72,7 @@ function statsFor(rows: TradeMetrics[], initial: number, range: Range): PeriodSt
   };
 }
 
-async function activeDays(): Promise<string[]> {
+export async function activeDays(): Promise<string[]> {
   const [trades, analyses] = await Promise.all([
     db().from("trades").select("created_at, entry_at"),
     db().from("analyses").select("analyzed_at"),
