@@ -289,7 +289,7 @@ export function TradeForm(p: Props) {
                   }}
                   placeholder="+ nou error (Enter)"
                   aria-label="Afegir una etiqueta d'error"
-                  className="h-7 w-40 rounded-full border border-dashed border-border bg-transparent px-3 text-xs text-fg placeholder:text-faint focus:border-primary/60 focus:outline-none"
+                  className="h-7 w-40 rounded-full border border-dashed border-border bg-transparent px-3 text-xs text-fg placeholder:text-dim focus:border-primary/60 focus:outline-none"
                 />
               </div>
               {[...errors].map((t) => <input key={t} type="hidden" name="tags_error" value={t} />)}

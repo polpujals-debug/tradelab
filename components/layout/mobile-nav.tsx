@@ -58,7 +58,7 @@ export function MobileNav({ unreadReports }: { unreadReports: number }) {
                     <item.icon className="size-5 text-accent" />
                     <span className="flex-1">{item.label}</span>
                     {item.badge === "unreadReports" && unreadReports > 0 && (
-                      <span className="num rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-5 text-white">{unreadReports}</span>
+                      <span className="num rounded-full bg-primary-hover px-1.5 text-[10px] font-semibold leading-5 text-white">{unreadReports}</span>
                     )}
                   </Link>
                 ))}

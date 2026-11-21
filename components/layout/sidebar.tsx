@@ -55,7 +55,7 @@ export function Sidebar({ initialCollapsed, unreadReports }: { initialCollapsed:
               {count > 0 && (
                 <span
                   className={cn(
-                    "num grid min-w-5 place-items-center rounded-full bg-primary px-1.5 text-[10px] font-semibold leading-5 text-white",
+                    "num grid min-w-5 place-items-center rounded-full bg-primary-hover px-1.5 text-[10px] font-semibold leading-5 text-white",
                     collapsed ? "absolute right-2 top-1 min-w-4 text-[9px] leading-4" : "ml-auto",
                   )}
                   aria-label={`${count} informes nous`}

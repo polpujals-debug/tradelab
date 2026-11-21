@@ -95,7 +95,7 @@ export function PnlCalendar({ data, today, hrefFor, currency }: { data: MonthCal
                       style={v && !out ? { backgroundColor: v.pnl >= 0 ? `rgb(16 185 129 / ${intensity})` : `rgb(239 68 68 / ${intensity})` } : undefined}
                       title={v ? `${d}: ${formatMoney(v.pnl, { currency, sign: true })} · ${v.trades} operacions` : d}
                     >
-                      <span className={cn("num text-sm font-semibold sm:text-base", isToday ? "inline-grid size-7 place-items-center rounded-lg bg-primary text-white" : out ? "text-faint" : "text-fg")}>
+                      <span className={cn("num text-sm font-semibold sm:text-base", isToday ? "inline-grid size-7 place-items-center rounded-lg bg-primary-hover text-white" : out ? "text-faint" : "text-fg")}>
                         {Number(d.slice(8))}
                       </span>
                       {v && !out && (
