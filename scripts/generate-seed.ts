@@ -17,6 +17,7 @@ const IMG_DIR = path.join(ROOT, "public", "seed");
 mkdirSync(IMG_DIR, { recursive: true });
 
 const rnd = mulberry32(20261121);
+const rndAt = mulberry32(777); // hores de les anàlisis (separat per no alterar la resta)
 const pick = <T,>(arr: readonly T[]): T => arr[Math.floor(rnd() * arr.length)];
 const q = (v: string | null | undefined) => (v == null ? "null" : `'${v.replace(/'/g, "''")}'`);
 const ago = (minutes: number) => `now() - interval '${Math.round(minutes)} minutes'`;
@@ -223,15 +224,16 @@ analysisPlan.forEach(([sym, daysAgo, bias, tfs, outcome], i) => {
   const scenario = bias === "bullish" ? `Continuació alcista cap a ${fmtP(res)} mentre aguanti ${fmtP(sup)}`
     : bias === "bearish" ? `Caiguda cap a ${fmtP(sup)} mentre no recuperi ${fmtP(res)}`
     : `Esperar sortida del rang ${fmtP(sup)}–${fmtP(res)}`;
-  const minutes = daysAgo * 1440 + 300 + rnd() * 300;
+  void (daysAgo * 1440 + 300 + rnd() * 300); // conserva la seqüència aleatòria
+  const at = madridAt(daysAgo, 8 * 60 + rndAt() * 90, 30); // 08:00–09:30, abans de la sessió
   analyses.push({ id, sym, daysAgo, bias });
   const reviewed = outcome !== "pending";
   analysisRows.push(`  ('${id}', '${a.id}', ${q(`${sym.split("/")[0]}: ${biasTitle[bias]}`)}, ${arr(tfs.split(","))}, '${bias}',
    '${JSON.stringify({ supports: [sup], resistances: [res], ma50: ma })}'::jsonb, ${q(md)}, ${q(scenario)},
-   '${outcome}', (${ago(minutes)} + interval '3 days')::date, ${reviewed ? `${ago(minutes)} + interval '3 days'` : "null"},
+   '${outcome}', ((${at}) + interval '3 days')::date, ${reviewed ? `(${at}) + interval '3 days'` : "null"},
    ${q(i === 3 ? "Em costa veure quan la MA50 és 'plana'. Preguntar quin pendent es considera pla." : i === 6 ? "Vaig ignorar que a 1H hi havia una divergència. Revisar." : null)},
-   ${q(i === 8 ? "Com distingeixo un rang d'un retrocés llarg?" : null)}, 'claude', ${ago(minutes)}, ${ago(minutes)})`);
-  mediaRows.push(`  ('analysis', '${id}', 'analysis', '${img.url}', '${img.thumb}', 'image/webp', 1280, 720, ${q(`${sym} ${tfs.split(",")[0]}`)}, 0, ${ago(minutes)})`);
+   ${q(i === 8 ? "Com distingeixo un rang d'un retrocés llarg?" : null)}, 'claude', ${at}, ${at})`);
+  mediaRows.push(`  ('analysis', '${id}', 'analysis', '${img.url}', '${img.thumb}', 'image/webp', 1280, 720, ${q(`${sym} ${tfs.split(",")[0]}`)}, 0, ${at})`);
 });
 out(`insert into analyses (id, asset_id, title, timeframes, bias, levels, content_md, scenario, outcome, review_at, reviewed_at, my_notes, questions, source, analyzed_at, created_at) values
 ${analysisRows.join(",\n")};

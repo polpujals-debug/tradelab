@@ -1,15 +1,19 @@
-import { KeyRound, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Suspense } from "react";
-import { EmptyState } from "@/components/shared/empty-state";
 import { Hero } from "@/components/shared/hero";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ApiKeys } from "@/features/settings/components/api-keys";
 import { FavoriteAssets, SettingsForm } from "@/features/settings/components/settings-form";
+import { db, must } from "@/lib/supabase/server";
 import { getDefaultAccount, getSettings, listAssets } from "@/features/settings/queries";
 
 export const metadata = { title: "Configuració" };
 
 async function Content() {
-  const [settings, account, assets] = await Promise.all([getSettings(), getDefaultAccount(), listAssets()]);
+  const [settings, account, assets, keys] = await Promise.all([
+    getSettings(), getDefaultAccount(), listAssets(),
+    db().from("api_keys").select("id, name, prefix, created_at, last_used_at, revoked_at").order("created_at", { ascending: false }),
+  ]);
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
       <SettingsForm
@@ -23,7 +27,7 @@ async function Content() {
       />
       <div className="space-y-6">
         <FavoriteAssets assets={assets} />
-        <EmptyState icon={KeyRound} title="Claus d'API" description="La gestió de claus per a Claude i la tasca programada arriba a la fase 4." />
+        <ApiKeys keys={must(keys, "Claus")} />
       </div>
     </div>
   );

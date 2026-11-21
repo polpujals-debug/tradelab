@@ -109,9 +109,9 @@ Mentre BTC/USDT aguanti per sobre de 91.759, espero continuació cap a 95.105,5.
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 95.105,5 mentre aguanti 91.759',
-   'fulfilled', (now() - interval '49555 minutes' + interval '3 days')::date, now() - interval '49555 minutes' + interval '3 days',
+   'fulfilled', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '34 days' + interval '542 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '34 days' + interval '542 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '49555 minutes', now() - interval '49555 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '34 days' + interval '542 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '34 days' + interval '542 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-00000000001d', 'b0000000-0000-4000-8000-000000000002', 'ETH: pèrdua de la MA50, biaix baixista', array['1H','5m']::text[], 'bearish',
    '{"supports":[3097.5],"resistances":[3214.76],"ma50":3231.06}'::jsonb, '### Què veig
 - **1H:** el preu ha perdut la **MA50** (3.231,06) i ara la mitjana actua com a resistència. Màxims decreixents.
@@ -126,9 +126,9 @@ Biaix baixista mentre no recuperi 3.214,76. Busco curts en retrocessos cap a la 
 
 ### Què invalidaria l''anàlisi
 Recuperar la MA50 de 1H amb un tancament clar per sobre.', 'Caiguda cap a 3.097,5 mentre no recuperi 3.214,76',
-   'failed', (now() - interval '43611 minutes' + interval '3 days')::date, now() - interval '43611 minutes' + interval '3 days',
+   'failed', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '30 days' + interval '483 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '30 days' + interval '483 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '43611 minutes', now() - interval '43611 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '30 days' + interval '483 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '30 days' + interval '483 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-00000000001e', 'b0000000-0000-4000-8000-000000000003', 'SOL: biaix alcista sobre la MA50', array['1H']::text[], 'bullish',
    '{"supports":[144.254],"resistances":[149.421],"ma50":162.514}'::jsonb, '### Què veig
 - **1H:** el preu cotitza **per sobre de la MA50** (162,514) i la mitjana té pendent positiu. Els darrers mínims són creixents.
@@ -144,9 +144,9 @@ Mentre SOL/USDT aguanti per sobre de 144,254, espero continuació cap a 149,421.
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 149,421 mentre aguanti 144,254',
-   'fulfilled', (now() - interval '37794 minutes' + interval '3 days')::date, now() - interval '37794 minutes' + interval '3 days',
+   'fulfilled', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '26 days' + interval '497 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '26 days' + interval '497 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '37794 minutes', now() - interval '37794 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '26 days' + interval '497 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '26 days' + interval '497 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-00000000001f', 'b0000000-0000-4000-8000-000000000001', 'BTC: rang sobre la MA50 plana, sense biaix', array['1H','5m']::text[], 'neutral',
    '{"supports":[93477.2],"resistances":[96917.4],"ma50":94714.1}'::jsonb, '### Què veig
 - **1H:** el preu està **enganxat a la MA50** (94.714,1) i la mitjana és plana. No hi ha biaix clar.
@@ -154,9 +154,9 @@ Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 149,421 me
 
 ### Escenari
 Segons la meva estratègia, **no opero** fins que el preu surti del rang i la MA50 agafi pendent. Vigilaré un trencament amb retest de 96.917,4 (llargs) o de 93.477,2 (curts).', 'Esperar sortida del rang 93.477,2–96.917,4',
-   'partial', (now() - interval '32228 minutes' + interval '3 days')::date, now() - interval '32228 minutes' + interval '3 days',
+   'partial', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '22 days' + interval '491 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '22 days' + interval '491 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    'Em costa veure quan la MA50 és ''plana''. Preguntar quin pendent es considera pla.',
-   null, 'claude', now() - interval '32228 minutes', now() - interval '32228 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '22 days' + interval '491 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '22 days' + interval '491 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000020', 'b0000000-0000-4000-8000-000000000002', 'ETH: biaix alcista sobre la MA50', array['1H','5m','1m']::text[], 'bullish',
    '{"supports":[3114.08],"resistances":[3225.26],"ma50":3226.06}'::jsonb, '### Què veig
 - **1H:** el preu cotitza **per sobre de la MA50** (3.226,06) i la mitjana té pendent positiu. Els darrers mínims són creixents.
@@ -172,9 +172,9 @@ Mentre ETH/USDT aguanti per sobre de 3.114,08, espero continuació cap a 3.225,2
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 3.225,26 mentre aguanti 3.114,08',
-   'fulfilled', (now() - interval '24930 minutes' + interval '3 days')::date, now() - interval '24930 minutes' + interval '3 days',
+   'fulfilled', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '17 days' + interval '537 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '17 days' + interval '537 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '24930 minutes', now() - interval '24930 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '17 days' + interval '537 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '17 days' + interval '537 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000021', 'b0000000-0000-4000-8000-000000000001', 'BTC: pèrdua de la MA50, biaix baixista', array['1H','5m']::text[], 'bearish',
    '{"supports":[90712.2],"resistances":[94425.5],"ma50":89213}'::jsonb, '### Què veig
 - **1H:** el preu ha perdut la **MA50** (89.213) i ara la mitjana actua com a resistència. Màxims decreixents.
@@ -189,9 +189,9 @@ Biaix baixista mentre no recuperi 94.425,5. Busco curts en retrocessos cap a la 
 
 ### Què invalidaria l''anàlisi
 Recuperar la MA50 de 1H amb un tancament clar per sobre.', 'Caiguda cap a 90.712,2 mentre no recuperi 94.425,5',
-   'fulfilled', (now() - interval '19273 minutes' + interval '3 days')::date, now() - interval '19273 minutes' + interval '3 days',
+   'fulfilled', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '13 days' + interval '514 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '13 days' + interval '514 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '19273 minutes', now() - interval '19273 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '13 days' + interval '514 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '13 days' + interval '514 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000022', 'b0000000-0000-4000-8000-000000000003', 'SOL: pèrdua de la MA50, biaix baixista', array['1H','5m']::text[], 'bearish',
    '{"supports":[143.187],"resistances":[147.694],"ma50":138.86}'::jsonb, '### Què veig
 - **1H:** el preu ha perdut la **MA50** (138,86) i ara la mitjana actua com a resistència. Màxims decreixents.
@@ -206,9 +206,9 @@ Biaix baixista mentre no recuperi 147,694. Busco curts en retrocessos cap a la r
 
 ### Què invalidaria l''anàlisi
 Recuperar la MA50 de 1H amb un tancament clar per sobre.', 'Caiguda cap a 143,187 mentre no recuperi 147,694',
-   'failed', (now() - interval '13388 minutes' + interval '3 days')::date, now() - interval '13388 minutes' + interval '3 days',
+   'failed', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '9 days' + interval '503 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '9 days' + interval '503 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    'Vaig ignorar que a 1H hi havia una divergència. Revisar.',
-   null, 'claude', now() - interval '13388 minutes', now() - interval '13388 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '9 days' + interval '503 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '9 days' + interval '503 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000023', 'b0000000-0000-4000-8000-000000000001', 'BTC: biaix alcista sobre la MA50', array['1H','5m']::text[], 'bullish',
    '{"supports":[90762.4],"resistances":[93557.4],"ma50":97501.9}'::jsonb, '### Què veig
 - **1H:** el preu cotitza **per sobre de la MA50** (97.501,9) i la mitjana té pendent positiu. Els darrers mínims són creixents.
@@ -224,9 +224,9 @@ Mentre BTC/USDT aguanti per sobre de 90.762,4, espero continuació cap a 93.557,
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 93.557,4 mentre aguanti 90.762,4',
-   'fulfilled', (now() - interval '9157 minutes' + interval '3 days')::date, now() - interval '9157 minutes' + interval '3 days',
+   'fulfilled', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '6 days' + interval '547 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, (least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '6 days' + interval '547 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days',
    null,
-   null, 'claude', now() - interval '9157 minutes', now() - interval '9157 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '6 days' + interval '547 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '6 days' + interval '547 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000024', 'b0000000-0000-4000-8000-000000000002', 'ETH: rang sobre la MA50 plana, sense biaix', array['1H']::text[], 'neutral',
    '{"supports":[3175.68],"resistances":[3312.88],"ma50":3335.78}'::jsonb, '### Què veig
 - **1H:** el preu està **enganxat a la MA50** (3.335,78) i la mitjana és plana. No hi ha biaix clar.
@@ -234,9 +234,9 @@ Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 93.557,4 m
 
 ### Escenari
 Segons la meva estratègia, **no opero** fins que el preu surti del rang i la MA50 agafi pendent. Vigilaré un trencament amb retest de 3.312,88 (llargs) o de 3.175,68 (curts).', 'Esperar sortida del rang 3.175,68–3.312,88',
-   'pending', (now() - interval '4780 minutes' + interval '3 days')::date, null,
+   'pending', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '3 days' + interval '536 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, null,
    null,
-   'Com distingeixo un rang d''un retrocés llarg?', 'claude', now() - interval '4780 minutes', now() - interval '4780 minutes'),
+   'Com distingeixo un rang d''un retrocés llarg?', 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '3 days' + interval '536 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '3 days' + interval '536 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000025', 'b0000000-0000-4000-8000-000000000001', 'BTC: biaix alcista sobre la MA50', array['1H','5m']::text[], 'bullish',
    '{"supports":[90831.8],"resistances":[94669.3],"ma50":100320.8}'::jsonb, '### Què veig
 - **1H:** el preu cotitza **per sobre de la MA50** (100.320,8) i la mitjana té pendent positiu. Els darrers mínims són creixents.
@@ -252,9 +252,9 @@ Mentre BTC/USDT aguanti per sobre de 90.831,8, espero continuació cap a 94.669,
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 94.669,3 mentre aguanti 90.831,8',
-   'pending', (now() - interval '1797 minutes' + interval '3 days')::date, null,
+   'pending', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '1 days' + interval '550 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, null,
    null,
-   null, 'claude', now() - interval '1797 minutes', now() - interval '1797 minutes'),
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '1 days' + interval '550 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '1 days' + interval '550 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('f0000000-0000-4000-8000-000000000026', 'b0000000-0000-4000-8000-000000000003', 'SOL: biaix alcista sobre la MA50', array['1H','5m']::text[], 'bullish',
    '{"supports":[139.908],"resistances":[144.459],"ma50":148.6}'::jsonb, '### Què veig
 - **1H:** el preu cotitza **per sobre de la MA50** (148,6) i la mitjana té pendent positiu. Els darrers mínims són creixents.
@@ -270,9 +270,9 @@ Mentre SOL/USDT aguanti per sobre de 139,908, espero continuació cap a 144,459.
 
 ### Què invalidaria l''anàlisi
 Un tancament de 1H per sota de la MA50.', 'Continuació alcista cap a 144,459 mentre aguanti 139,908',
-   'pending', (now() - interval '499 minutes' + interval '3 days')::date, null,
+   'pending', ((least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '0 days' + interval '543 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')) + interval '3 days')::date, null,
    null,
-   null, 'claude', now() - interval '499 minutes', now() - interval '499 minutes');
+   null, 'claude', least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '0 days' + interval '543 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'), least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '0 days' + interval '543 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes'));
 
 insert into trades (id, account_id, asset_id, strategy_id, analysis_id, direction, status, entry_at, exit_at,
   entry_price, stop_loss, take_profit, exit_price, quantity, leverage, fees, capital_at_entry,
@@ -1304,17 +1304,17 @@ Setmana de consolidació: BTC ha fet un rang ample i les altcoins han perdut for
 - Revisar dissabte el diari d''operacions i actualitzar el playbook si cal.', (date_trunc('week', now()) - interval '0 weeks')::date, 'neutral', 'neutral', array['BTC/USDT','ETH/USDT','SOL/USDT']::text[], false, 'scheduled', 'seed-weekly-0', date_trunc('week', now()) - interval '0 weeks' + interval '8 hours');
 
 insert into media (entity_type, entity_id, kind, url, thumb_url, mime_type, width, height, caption, sort_order, created_at) values
-  ('analysis', 'f0000000-0000-4000-8000-00000000001c', 'analysis', '/seed/analysis_1.webp', '/seed/analysis_1_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, now() - interval '49555 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-00000000001d', 'analysis', '/seed/analysis_2.webp', '/seed/analysis_2_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, now() - interval '43611 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-00000000001e', 'analysis', '/seed/analysis_3.webp', '/seed/analysis_3_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, now() - interval '37794 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-00000000001f', 'analysis', '/seed/analysis_4.webp', '/seed/analysis_4_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, now() - interval '32228 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000020', 'analysis', '/seed/analysis_5.webp', '/seed/analysis_5_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, now() - interval '24930 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000021', 'analysis', '/seed/analysis_6.webp', '/seed/analysis_6_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, now() - interval '19273 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000022', 'analysis', '/seed/analysis_7.webp', '/seed/analysis_7_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, now() - interval '13388 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000023', 'analysis', '/seed/analysis_8.webp', '/seed/analysis_8_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, now() - interval '9157 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000024', 'analysis', '/seed/analysis_9.webp', '/seed/analysis_9_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, now() - interval '4780 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000025', 'analysis', '/seed/analysis_10.webp', '/seed/analysis_10_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, now() - interval '1797 minutes'),
-  ('analysis', 'f0000000-0000-4000-8000-000000000026', 'analysis', '/seed/analysis_11.webp', '/seed/analysis_11_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, now() - interval '499 minutes'),
+  ('analysis', 'f0000000-0000-4000-8000-00000000001c', 'analysis', '/seed/analysis_1.webp', '/seed/analysis_1_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '34 days' + interval '542 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-00000000001d', 'analysis', '/seed/analysis_2.webp', '/seed/analysis_2_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '30 days' + interval '483 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-00000000001e', 'analysis', '/seed/analysis_3.webp', '/seed/analysis_3_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '26 days' + interval '497 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-00000000001f', 'analysis', '/seed/analysis_4.webp', '/seed/analysis_4_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '22 days' + interval '491 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000020', 'analysis', '/seed/analysis_5.webp', '/seed/analysis_5_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '17 days' + interval '537 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000021', 'analysis', '/seed/analysis_6.webp', '/seed/analysis_6_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '13 days' + interval '514 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000022', 'analysis', '/seed/analysis_7.webp', '/seed/analysis_7_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '9 days' + interval '503 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000023', 'analysis', '/seed/analysis_8.webp', '/seed/analysis_8_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '6 days' + interval '547 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000024', 'analysis', '/seed/analysis_9.webp', '/seed/analysis_9_thumb.webp', 'image/webp', 1280, 720, 'ETH/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '3 days' + interval '536 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000025', 'analysis', '/seed/analysis_10.webp', '/seed/analysis_10_thumb.webp', 'image/webp', 1280, 720, 'BTC/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '1 days' + interval '550 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
+  ('analysis', 'f0000000-0000-4000-8000-000000000026', 'analysis', '/seed/analysis_11.webp', '/seed/analysis_11_thumb.webp', 'image/webp', 1280, 720, 'SOL/USDT 1H', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '0 days' + interval '543 minutes') at time zone 'Europe/Madrid', now() - interval '30 minutes')),
   ('trade', '10000000-0000-4000-8000-00000000002a', 'before', '/seed/trade_4_before.webp', '/seed/trade_4_before_thumb.webp', 'image/webp', 1280, 720, 'Pla a 5m', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '40 days' + interval '998 minutes') at time zone 'Europe/Madrid', now() - interval '137 minutes')),
   ('trade', '10000000-0000-4000-8000-00000000002a', 'after', '/seed/trade_4_after.webp', '/seed/trade_4_after_thumb.webp', 'image/webp', 1280, 720, 'Resultat', 1, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '40 days' + interval '1041 minutes') at time zone 'Europe/Madrid', now() - interval '5 minutes')),
   ('trade', '10000000-0000-4000-8000-00000000002e', 'before', '/seed/trade_8_before.webp', '/seed/trade_8_before_thumb.webp', 'image/webp', 1280, 720, 'Pla a 5m', 0, least((date_trunc('day', now() at time zone 'Europe/Madrid') - interval '36 days' + interval '732 minutes') at time zone 'Europe/Madrid', now() - interval '135 minutes')),

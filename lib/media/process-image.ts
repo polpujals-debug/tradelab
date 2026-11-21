@@ -47,6 +47,11 @@ export async function fetchImage(url: string): Promise<Buffer> {
     throw new ImageError("La URL de la imatge no és vàlida.");
   }
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") throw new ImageError("Només s'accepten URL http(s).");
+  // Evita que la plataforma faci peticions a xarxes internes (SSRF bàsic)
+  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (host === "localhost" || host.endsWith(".local") || host.endsWith(".internal") || /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|::1$|fc|fd)/.test(host)) {
+    throw new ImageError("No es poden descarregar imatges d'adreces internes.");
+  }
   const res = await fetch(parsed, { signal: AbortSignal.timeout(15_000), redirect: "follow" });
   if (!res.ok) throw new ImageError(`No s'ha pogut descarregar la imatge (HTTP ${res.status}).`);
   const len = Number(res.headers.get("content-length") ?? 0);

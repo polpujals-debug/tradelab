@@ -1,5 +1,5 @@
 import {
-  BookOpenText, Calculator, ChartCandlestick, GraduationCap, LayoutDashboard, Newspaper, Settings, Target, TrendingUp,
+  BookOpenText, Calculator, ChartCandlestick, Code2, GraduationCap, LayoutDashboard, Newspaper, Settings, Target, TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +21,7 @@ export const NAV: NavItem[] = [
   { href: "/informes", label: "Informes de mercat", icon: Newspaper, badge: "unreadReports" },
   { href: "/rendiment", label: "Rendiment", icon: TrendingUp },
   { href: "/configuracio", label: "Configuració", icon: Settings },
+  { href: "/docs/api", label: "API", icon: Code2 },
 ];
 
 export function isActive(pathname: string, href: string) {
