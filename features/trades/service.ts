@@ -1,6 +1,7 @@
 import "server-only";
 import { calcPositionSize } from "@/lib/finance";
-import { localDate, startOfWeek, zonedMidnightUtc } from "@/lib/time";
+import { startOfWeek, zonedMidnightUtc } from "@/lib/time";
+import { today as todayLocal } from "@/lib/today";
 import { db, maybe, must } from "@/lib/supabase/server";
 import type { Enum, Insert, Update } from "@/lib/supabase/types";
 import type { StoredImage } from "@/lib/media/process-image";
@@ -203,7 +204,7 @@ export async function attachMedia(
 
 /** Estat de disciplina del dia/setmana (hora de Madrid). */
 export async function disciplineState(accountId: string) {
-  const today = localDate(new Date());
+  const today = await todayLocal();
   const weekStart = startOfWeek(today);
   const [daily, opened] = await Promise.all([
     db().from("v_daily_pnl").select("day, net_pnl").eq("account_id", accountId).gte("day", weekStart),

@@ -1,14 +1,13 @@
 import "server-only";
+import { cache } from "react";
 import { db, must } from "@/lib/supabase/server";
 import type { Row } from "@/lib/supabase/types";
 
 export type Settings = Row<"settings">;
 
-export async function getSettings(): Promise<Settings> {
-  return must(await db().from("settings").select("*").eq("id", 1).single(), "Configuració");
-}
+export const getSettings = cache(async (): Promise<Settings> => must(await db().from("settings").select("*").eq("id", 1).single(), "Configuració"));
 
-export async function getDefaultAccount() {
+export const getDefaultAccount = cache(async () => {
   const settings = await getSettings();
   const q = db().from("v_account_balance").select("*");
   const res = settings.default_account_id
@@ -23,7 +22,7 @@ export async function getDefaultAccount() {
     initialCapital: Number(account.initial_capital),
     currentCapital: Number(account.current_capital ?? account.initial_capital),
   };
-}
+});
 
 export async function listAccounts() {
   return must(await db().from("v_account_balance").select("*").order("name"), "Comptes");

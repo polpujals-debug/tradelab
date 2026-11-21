@@ -120,3 +120,13 @@ body {
 .prose-dark th, .prose-dark td { border: 1px solid var(--color-border); padding: 0.5em 0.75em; text-align: left; }
 .prose-dark th { background: #0b0f1a; color: var(--color-muted); font-weight: 500; }
 .prose-dark hr { border-color: var(--color-border); margin: 2em 0; }
+
+/* Impressió / exportació a PDF: amaga la navegació i conserva el tema fosc */
+@media print {
+  @page { margin: 12mm; }
+  html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #05070d !important; }
+  aside, nav, header, .no-print, [data-sonner-toaster] { display: none !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  .glass { backdrop-filter: none !important; }
+  .break-inside-avoid { break-inside: avoid; }
+}
