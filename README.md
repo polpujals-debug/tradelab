@@ -84,7 +84,9 @@ Obre http://localhost:3000. Per crear una clau d'API: **Configuració → Claus 
 ### 1. Supabase
 
 1. Crea un projecte a https://supabase.com (regió Europa, per exemple `eu-central-1`).
-2. Aplica les migracions des del teu ordinador:
+2. **Opció fàcil (sense instal·lar res):** *SQL Editor → New query*, enganxa `supabase/1-estructura.sql` i prem **Run**. Després, si vols dades d'exemple, fes el mateix amb `supabase/2-dades-exemple.sql`.
+
+   **Opció amb terminal:** aplica les migracions des del teu ordinador:
 
    ```bash
    npx supabase login
