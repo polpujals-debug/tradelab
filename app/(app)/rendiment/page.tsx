@@ -2,6 +2,7 @@ import { AlertOctagon, ChevronLeft, ChevronRight, Download, Lightbulb, ListOrder
 import Link from "next/link";
 import { Suspense } from "react";
 import { Hero, PanelTitle, StatTile } from "@/components/shared/hero";
+import { TabLinks } from "@/components/shared/tab-links";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Pnl } from "@/components/shared/pnl";
 import { Button } from "@/components/ui/button";
@@ -54,18 +55,11 @@ async function Report({ searchParams }: { searchParams: PageProps<"/rendiment">[
         description={<span className="first-letter:uppercase">{rangeLabel(r.range)}</span>}
         actions={
           <div className="no-print flex flex-wrap items-center gap-2">
-            <nav aria-label="Tipus d'informe" className="inline-flex rounded-xl border border-border bg-bg/60 p-1">
-              {KINDS.map((k) => (
-                <Link key={k.kind} href={`/rendiment?tipus=${k.param}`} aria-current={k.kind === kind ? "page" : undefined}
-                  className={cn("rounded-lg px-3 py-1.5 text-xs font-medium", k.kind === kind ? "bg-primary/15 text-accent shadow-[inset_0_0_0_1px_rgb(59_130_246/0.35)]" : "text-muted hover:text-fg")}>
-                  {k.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="flex rounded-xl border border-border bg-bg/60">
-              <Link href={`/rendiment?tipus=${param}&data=${prevAnchor}`} aria-label="Període anterior" className="grid size-9 place-items-center text-muted hover:text-fg"><ChevronLeft className="size-4" /></Link>
-              <Link href={`/rendiment?tipus=${param}&data=${nextAnchor}`} aria-label="Període següent" className="grid size-9 place-items-center text-muted hover:text-fg"><ChevronRight className="size-4" /></Link>
-            </div>
+            <TabLinks ariaLabel="Tipus d'informe" items={KINDS.map((k) => ({ href: `/rendiment?tipus=${k.param}`, label: k.label, active: k.kind === kind }))} />
+            <TabLinks ariaLabel="Navegar per períodes" variant="icons" items={[
+              { href: `/rendiment?tipus=${param}&data=${prevAnchor}`, label: <ChevronLeft className="size-4" />, active: false, ariaLabel: "Període anterior" },
+              { href: `/rendiment?tipus=${param}&data=${nextAnchor}`, label: <ChevronRight className="size-4" />, active: false, ariaLabel: "Període següent" },
+            ]} />
             <Button variant="secondary" asChild>
               <a href={`/rendiment/export?tipus=${kind}${anchor ? `&data=${anchor}` : ""}`}><Download /> Markdown</a>
             </Button>
