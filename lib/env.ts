@@ -2,8 +2,9 @@ import "server-only";
 import { z } from "zod";
 
 const schema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20),
+  // Accepta també la URL copiada amb /rest/v1 o una barra final i la normalitza
+  NEXT_PUBLIC_SUPABASE_URL: z.string().trim().transform((u) => u.replace(/\/(rest|storage|auth)\/v1\/?$/, "").replace(/\/+$/, "")).pipe(z.url()),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().trim().min(20),
   SUPABASE_STORAGE_BUCKET: z.string().default("media"),
   APP_TIMEZONE: z.string().default("Europe/Madrid"),
 });

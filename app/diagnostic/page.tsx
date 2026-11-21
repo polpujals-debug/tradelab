@@ -27,12 +27,14 @@ function keyKind(key: string | undefined): { ok: boolean; detail: string } {
 
 async function Checks() {
   await connection();
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = rawUrl?.trim().replace(/\/(rest|storage|auth)\/v1\/?$/, "").replace(/\/+$/, "");
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const checks: Check[] = [];
 
   const urlOk = !!url && /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(url.trim()) || (!!url && url.startsWith("http://127.0.0.1"));
-  checks.push({ name: "NEXT_PUBLIC_SUPABASE_URL", ok: urlOk, detail: !url ? "No està definida a Vercel." : urlOk ? `Format correcte (${new URL(url).host}).` : `Format inesperat: ha de ser https://xxxx.supabase.co (ara: «${url.slice(0, 60)}»).` });
+  const fixed = !!rawUrl && rawUrl.trim() !== url;
+  checks.push({ name: "NEXT_PUBLIC_SUPABASE_URL", ok: urlOk, detail: !url ? "No està definida a Vercel." : urlOk ? `Format correcte (${new URL(url).host}).${fixed ? " Nota: tenia un tros de més al final (/rest/v1 o /), l'app el treu sola." : ""}` : `Format inesperat: ha de ser https://xxxx.supabase.co (ara: «${url.slice(0, 60)}»).` });
   const kk = keyKind(key);
   checks.push({ name: "SUPABASE_SERVICE_ROLE_KEY", ...kk });
 
