@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ───────── TradeLab · tokens de disseny (mode fosc únic) ───────── */
+@theme {
+  --color-bg: #05070d;
+  --color-surface: #0b0f1a;
+  --color-card: #111827;
+  --color-card-hover: #141c2e;
+  --color-border: #1e293b;
+  --color-border-strong: #2a3a52;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-accent: #60a5fa;
+  --color-glow: #2563eb;
+  --color-cyan: #22d3ee;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-profit: #10b981;
+  --color-loss: #ef4444;
+  --color-warning: #f59e0b;
+
+  --color-fg: #e5e7eb;
+  --color-muted: #94a3b8;
+  --color-dim: #64748b;
+  --color-faint: #475569;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "JetBrains Mono", monospace;
+
+  --radius-2xl: 1rem;
+  --shadow-glow: 0 0 0 1px rgb(59 130 246 / 0.25), 0 8px 32px -8px rgb(37 99 235 / 0.35);
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  color-scheme: dark;
 }
+
+html,
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  /* gradient radial blau fosc molt suau */
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgb(37 99 235 / 0.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgb(34 211 238 / 0.05), transparent 60%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgb(59 130 246 / 0.35);
+}
+
+/* Focus visible accessible a tota l'app */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Xifres tabulars per a números i preus */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Barres de desplaçament discretes */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+@utility glass {
+  background-color: rgb(17 24 39 / 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Markdown (informes, anàlisis, playbook) */
+.prose-dark {
+  color: var(--color-fg);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+.prose-dark h1, .prose-dark h2, .prose-dark h3 {
+  color: #f8fafc;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 1.6em 0 0.6em;
+}
+.prose-dark h1 { font-size: 1.5rem; }
+.prose-dark h2 { font-size: 1.2rem; padding-bottom: 0.35em; border-bottom: 1px solid var(--color-border); }
+.prose-dark h3 { font-size: 1.05rem; color: var(--color-accent); }
+.prose-dark > :first-child { margin-top: 0; }
+.prose-dark p { margin: 0.75em 0; }
+.prose-dark ul, .prose-dark ol { margin: 0.75em 0; padding-left: 1.4em; }
+.prose-dark ul { list-style: disc; }
+.prose-dark ol { list-style: decimal; }
+.prose-dark li { margin: 0.3em 0; }
+.prose-dark li::marker { color: var(--color-primary); }
+.prose-dark strong { color: #f8fafc; font-weight: 600; }
+.prose-dark a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+.prose-dark code { font-family: var(--font-mono); font-size: 0.85em; background: #0b0f1a; border: 1px solid var(--color-border); padding: 0.1em 0.35em; border-radius: 6px; }
+.prose-dark pre { background: #0b0f1a; border: 1px solid var(--color-border); border-radius: 12px; padding: 1em; overflow-x: auto; }
+.prose-dark pre code { border: 0; padding: 0; background: transparent; }
+.prose-dark blockquote { border-left: 3px solid var(--color-primary); padding-left: 1em; color: var(--color-muted); }
+.prose-dark table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: 0.9em; display: block; overflow-x: auto; }
+.prose-dark th, .prose-dark td { border: 1px solid var(--color-border); padding: 0.5em 0.75em; text-align: left; }
+.prose-dark th { background: #0b0f1a; color: var(--color-muted); font-weight: 500; }
+.prose-dark hr { border-color: var(--color-border); margin: 2em 0; }
