@@ -2,10 +2,16 @@ import "server-only";
 import { cache } from "react";
 import { db, must } from "@/lib/supabase/server";
 import type { Row } from "@/lib/supabase/types";
+import { ensureBootstrap } from "./bootstrap";
 
 export type Settings = Row<"settings">;
 
-export const getSettings = cache(async (): Promise<Settings> => must(await db().from("settings").select("*").eq("id", 1).single(), "Configuració"));
+export const getSettings = cache(async (): Promise<Settings> => {
+  const first = await db().from("settings").select("*").eq("id", 1).maybeSingle();
+  if (first.data) return first.data;
+  await ensureBootstrap(); // base de dades sense configuració: la crea
+  return must(await db().from("settings").select("*").eq("id", 1).single(), "Configuració");
+});
 
 export const getDefaultAccount = cache(async () => {
   const settings = await getSettings();
