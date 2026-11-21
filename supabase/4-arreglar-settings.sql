@@ -3,7 +3,8 @@
 do $$
 begin
   if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'settings')
-     and not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'settings' and column_name = 'default_risk_pct') then
+     and (not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'settings' and column_name = 'id')
+          or not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'settings' and column_name = 'default_risk_pct')) then
     if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'settings_antiga') then
       execute 'alter table public.settings rename to settings_antiga_' || to_char(now(), 'YYYYMMDDHH24MISS');
     else
