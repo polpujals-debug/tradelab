@@ -7,6 +7,42 @@
 -- ║ Al final mostra un resum: tot ha de sortir OK.                         ║
 -- ╚══════════════════════════════════════════════════════════════════════╝
 
+-- ── Comprovació: el codi NO ha d'estar traduït pel navegador ──
+do $$
+begin
+  if 'scheduled' <> ('sched' || 'uled') or 'sort_order' <> ('sort' || '_' || 'order') then
+    raise exception 'ATURAT: el text d''aquest fitxer s''ha traduït automàticament (p. ex. "scheduled" → "programat"). Desactiva la traducció del navegador i torna a copiar el fitxer des del Bloc de notes.';
+  end if;
+end $$;
+
+-- ── Pas 0: tipus (enums) amb valors diferents dels de TradeLab (p. ex. traduïts) → s'aparten ──
+do $$
+declare r record; cur text[];
+begin
+  for r in select * from (values
+    ('account_type', array['paper','real']::text[]),
+    ('trade_direction', array['long','short']::text[]),
+    ('trade_status', array['planned','open','closed','cancelled']::text[]),
+    ('market_bias', array['bullish','bearish','neutral']::text[]),
+    ('analysis_outcome', array['pending','fulfilled','partial','failed']::text[]),
+    ('content_source', array['claude','manual','scheduled']::text[]),
+    ('media_kind', array['before','during','after','analysis','report','example']::text[]),
+    ('media_entity', array['trade','analysis','market_report','concept']::text[]),
+    ('tag_kind', array['error','emotion','setup']::text[]),
+    ('report_type', array['daily','weekly','adhoc']::text[]),
+    ('concept_status', array['pending','learning','mastered']::text[]),
+    ('goal_kind', array['journal_streak','winning_trades','trades_count','net_pnl','win_rate','custom']::text[])
+  ) as x(nom, valors) loop
+    select array_agg(e.enumlabel::text order by e.enumsortorder) into cur
+      from pg_enum e join pg_type t on t.oid = e.enumtypid join pg_namespace n on n.oid = t.typnamespace
+     where n.nspname = 'public' and t.typname = r.nom;
+    if cur is not null and cur is distinct from r.valors then
+      execute format('alter type public.%I rename to %I', r.nom, r.nom || '_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS'));
+      raise notice 'Tipus % tenia valors diferents (%): apartat', r.nom, cur;
+    end if;
+  end loop;
+end $$;
+
 -- ── Pas 1: cada taula amb nom de TradeLab ha de tenir TOTES les columnes correctes ──
 -- Si no quadra: buida → es torna a crear; amb dades → s'aparta com a <nom>_antiga (no s'esborra).
 do $$
@@ -36,6 +72,7 @@ begin
     if k is null then continue; end if;
     select count(*) into falten from unnest(r.cols) col
      where not exists (select 1 from information_schema.columns ic where ic.table_schema = 'public' and ic.table_name = r.taula and ic.column_name = col);
+    falten := falten + (select count(*) from information_schema.columns ic where ic.table_schema = 'public' and ic.table_name = r.taula and ic.udt_name like '%\_antiga\_%');
     if k = 'r' and falten = 0 then continue; end if;
     files := 0;
     if k = 'r' then execute format('select count(*) from public.%I', r.taula) into files; end if;
