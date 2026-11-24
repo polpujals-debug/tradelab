@@ -13,10 +13,24 @@ import { createApiKeyAction, revokeApiKeyAction } from "../api-key-actions";
 
 interface Key { id: string; name: string; prefix: string; created_at: string; last_used_at: string | null; revoked_at: string | null }
 
+function CopyRow({ label, value }: { label: string; value: string }) {
+  const [done, setDone] = useState(false);
+  return (
+    <div>
+      <p className="mb-1 text-[11px] text-muted">{label}</p>
+      <div className="flex gap-2">
+        <code className="num min-w-0 flex-1 truncate rounded-lg border border-border bg-bg px-2.5 py-2 text-xs text-fg">{value}</code>
+        <Button size="sm" variant="secondary" aria-label={`Copiar: ${label}`} onClick={async () => { await navigator.clipboard.writeText(value); setDone(true); toast.success("Copiat"); }}>
+          {done ? <Check /> : <Copy />}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function ApiKeys({ keys }: { keys: Key[] }) {
   const [name, setName] = useState("");
   const [fresh, setFresh] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [pending, start] = useTransition();
 
   return (
@@ -29,20 +43,17 @@ export function ApiKeys({ keys }: { keys: Key[] }) {
         <p className="text-xs text-muted">Per a Claude (xat i tasca programada). Fes servir una clau diferent per a cada ús i revoca-la si es filtra.</p>
 
         {fresh && (
-          <div className="space-y-2 rounded-xl border border-warning/40 bg-warning/10 p-3">
-            <p className="text-xs font-medium text-warning">Copia-la ara: no es tornarà a mostrar.</p>
-            <div className="flex gap-2">
-              <code className="num min-w-0 flex-1 truncate rounded-lg border border-border bg-bg px-2.5 py-2 text-xs text-fg">{fresh}</code>
-              <Button size="sm" variant="secondary" onClick={async () => { await navigator.clipboard.writeText(fresh); setCopied(true); toast.success("Clau copiada"); }}>
-                {copied ? <Check /> : <Copy />}
-              </Button>
-            </div>
-            <button className="text-[11px] text-dim underline cursor-pointer" onClick={() => { setFresh(null); setCopied(false); }}>Ja l&apos;he desada</button>
+          <div className="space-y-3 rounded-xl border border-warning/40 bg-warning/10 p-3">
+            <p className="text-xs font-medium text-warning">Copia-ho ara: no es tornarà a mostrar.</p>
+            <CopyRow label="Adreça del connector per a Claude (recomanat)" value={`${typeof window === "undefined" ? "" : window.location.origin}/api/mcp/${fresh}`} />
+            <CopyRow label="Clau d'API (per a l'API o el servidor MCP local)" value={fresh} />
+            <p className="text-[11px] text-muted">A Claude: <b>Configuració → Connectors → Afegeix un connector personalitzat</b> → enganxa l&apos;adreça del connector.</p>
+            <button className="text-[11px] text-dim underline cursor-pointer" onClick={() => setFresh(null)}>Ja ho he desat</button>
           </div>
         )}
 
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); start(async () => { const r = await createApiKeyAction(name); if (r.ok) { setFresh(r.key); setName(""); } else toast.error(r.message); }); }}>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom (ex.: Claude xat)" aria-label="Nom de la clau" />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom (ex.: Connector Claude)" aria-label="Nom de la clau" />
           <Button type="submit" disabled={pending}>{pending ? <Loader2 className="animate-spin" /> : <Plus />} Crear</Button>
         </form>
 

@@ -1,5 +1,21 @@
 <!-- Generat amb `npm run docs:generate` a partir de features/api-docs/content.ts. Substitueix https://EL-TEU-TRADELAB.vercel.app per la URL real (o mira /docs/api a l'app, que ja la porta posada). -->
 
+# Connector de Claude (la manera més fàcil)
+
+1. A TradeLab, **Configuració → Claus d'API → Crear** (nom: «Connector Claude») i copia l'**adreça del connector** (`https://EL-TEU-TRADELAB.vercel.app/api/mcp/tl_...`).
+2. A Claude (web o app d'escriptori): **Configuració → Connectors → Afegeix un connector personalitzat**. Nom: **TradeLab**. URL: l'adreça del connector. Desa.
+3. En un xat, activa el connector **TradeLab** (icona d'eines) i ja el pots fer servir també des del mòbil.
+
+**Eines que tindrà Claude:** `get_account`, `open_trade`, `close_trade`, `list_open_trades`, `save_analysis`, `update_analysis`, `publish_market_report`, `get_stats`.
+
+**Rutina en un xat amb TradingView:**
+- «Entro long a BTC a 92.000 amb SL a 91.600 i TP a 92.800. Fes una captura del gràfic i registra l'operació a TradeLab.» → Claude fa la captura (enllaç de TradingView) i crida `open_trade` amb la captura d'abans.
+- «He tancat a 92.800. Fes la captura i tanca-la a TradeLab.» → Claude crida `close_trade` amb la captura de després: el P&L se suma al capital i queda al Diari.
+
+> Les captures s'envien millor com a **enllaç de TradingView** (*Captura → Copia l'enllaç*, `https://www.tradingview.com/x/...`): TradeLab en descarrega la imatge.
+
+---
+
 # Instruccions per a Claude · TradeLab
 
 Enganxa aquest text a Claude (xat o tasca programada). Substitueix `<API_KEY>` per una clau creada a **TradeLab → Configuració → Claus d'API** (fes servir una clau per al xat i una altra per a la tasca programada).

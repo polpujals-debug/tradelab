@@ -38,11 +38,22 @@ export function decodeBase64Image(input: string): Buffer {
   return Buffer.from(clean, "base64");
 }
 
+/**
+ * Enllaç de captura de TradingView (https://www.tradingview.com/x/AbCd1234/) → URL directa de la imatge.
+ * Retorna null si no és un enllaç de captura de TradingView.
+ */
+export function tradingViewSnapshotUrl(url: string): string | null {
+  const m = /^https?:\/\/(?:[a-z]{2,3}\.|www\.)?tradingview\.com\/x\/([A-Za-z0-9]{6,12})\/?/.exec(url.trim());
+  if (!m) return null;
+  const id = m[1];
+  return `https://s3.tradingview.com/snapshots/${id[0].toLowerCase()}/${id}.png`;
+}
+
 /** Descarrega una imatge d'una URL pública (http/https), amb límit de mida i temps. */
 export async function fetchImage(url: string): Promise<Buffer> {
   let parsed: URL;
   try {
-    parsed = new URL(url);
+    parsed = new URL(tradingViewSnapshotUrl(url) ?? url);
   } catch {
     throw new ImageError("La URL de la imatge no és vàlida.");
   }
