@@ -38,7 +38,7 @@ begin
   ) as x(taula, cols) loop
     for c in select column_name from information_schema.columns
               where table_schema = 'public' and table_name = r.taula and is_nullable = 'NO'
-                and column_default is null and not (column_name = any(r.cols)) loop
+                and not (column_name = any(r.cols)) loop
       execute format('alter table public.%I alter column %I drop not null', r.taula, c.column_name);
       raise notice 'Columna %.% (no és de TradeLab) ara és opcional', r.taula, c.column_name;
     end loop;
@@ -50,6 +50,6 @@ notify pgrst, 'reload schema';
 -- Resultat: ha de sortir 0
 select count(*) as columnes_obligatories_que_sobren
 from information_schema.columns ic
-where ic.table_schema = 'public' and ic.is_nullable = 'NO' and ic.column_default is null
+where ic.table_schema = 'public' and ic.is_nullable = 'NO'
   and ic.table_name in ('accounts','assets','strategies','strategy_rules','analyses','trades','trade_rule_checks','tags','trade_tags','market_reports','concepts','concept_examples','media','goals','practice_attempts','settings','api_keys','idempotency_keys')
   and ic.column_name not in ('id','name','type','initial_capital','currency','is_default','created_at','updated_at','symbol','is_favorite','version','description_md','timeframes','indicators','is_active','strategy_id','text','sort_order','is_required','asset_id','title','bias','levels','content_md','outcome','source','analyzed_at','account_id','direction','status','entry_price','stop_loss','quantity','leverage','fees','capital_at_entry','trade_id','rule_id','passed','kind','tag_id','report_date','watchlist','is_read','slug','category','concept_id','url','target','manual_progress','starts_on','default_risk_pct','risk_warning_pct','timezone','locale','prefix','key_hash','key','scope','request_hash','status_code','response');

@@ -577,7 +577,7 @@ begin
   ) as x(taula, cols) loop
     for c in select column_name from information_schema.columns
               where table_schema = 'public' and table_name = r.taula and is_nullable = 'NO'
-                and column_default is null and not (column_name = any(r.cols)) loop
+                and not (column_name = any(r.cols)) loop
       execute format('alter table public.%I alter column %I drop not null', r.taula, c.column_name);
       raise notice 'Columna %.% (no és de TradeLab) ara és opcional', r.taula, c.column_name;
     end loop;
