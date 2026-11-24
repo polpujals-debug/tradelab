@@ -39,6 +39,8 @@ lib/
 supabase/
   migrations/       esquema, vistes de càlcul (v_trade_metrics, v_daily_pnl…) i bucket
   seed.sql          dades d'exemple (generat per scripts/generate-seed.ts)
+  INSTAL·LAR.sql    instal·lació en un sol fitxer per al SQL Editor (generat a partir de migrations/)
+  DADES-EXEMPLE.sql dades d'exemple per al SQL Editor (generat a partir de seed.sql)
   clean-demo-data.sql   esborra les dades d'exemple
 mcp-server/         servidor MCP (vegeu mcp-server/README.md)
 API.md              referència de l'API
@@ -84,24 +86,13 @@ Obre http://localhost:3000. Per crear una clau d'API: **Configuració → Claus 
 ### 1. Supabase
 
 1. Crea un projecte a https://supabase.com (regió Europa, per exemple `eu-central-1`).
-2. **Opció fàcil (sense instal·lar res):** *SQL Editor → New query*, enganxa `supabase/1-estructura.sql` i prem **Run**. Després, si vols dades d'exemple, fes el mateix amb `supabase/2-dades-exemple.sql`.
+2. Obre *SQL Editor → New query*, enganxa **tot** el fitxer [`supabase/INSTAL·LAR.sql`](supabase/INSTAL·LAR.sql) i prem **Run**.
+3. Comprova el resum que surt a sota: totes les files han de dir **OK** (18 taules, 5 vistes, bucket de captures 1, configuració 1).
 
-   **Opció amb terminal:** aplica les migracions des del teu ordinador:
-
-   ```bash
-   npx supabase login
-   ```
-
-   ```bash
-   npx supabase link --project-ref <ID_DEL_PROJECTE>
-   ```
-
-   ```bash
-   npx supabase db push
-   ```
-
-   Això crea totes les taules, les vistes, l'RLS i el bucket `media` per a les captures.
-3. **Dades d'exemple (opcional):** obre *SQL Editor*, enganxa `supabase/seed.sql` i executa'l. Quan vulguis començar de debò, executa `supabase/clean-demo-data.sql`.
+   - Es pot executar tantes vegades com calgui: crea només el que falti i no esborra res. Si una instal·lació ha quedat a mitges o després d'actualitzar TradeLab, torna'l a executar.
+   - Si ja hi havia taules o vistes amb el mateix nom d'una altra aplicació, les reanomena a `<nom>_antiga` (ho indica als missatges).
+   - **Dades d'exemple (opcional):** fes el mateix amb [`supabase/DADES-EXEMPLE.sql`](supabase/DADES-EXEMPLE.sql). Substitueix comptes, configuració i operacions per les d'exemple. Quan vulguis començar de debò, executa `supabase/clean-demo-data.sql`.
+   - **Alternativa amb terminal:** `npx supabase login`, `npx supabase link --project-ref <ID_DEL_PROJECTE>` i `npx supabase db push` apliquen les migracions directament (en un projecte nou, sense haver executat abans `INSTAL·LAR.sql`).
 4. A *Project Settings → API*, copia la **Project URL** i la **service_role key**.
 
 ### 2. Vercel
@@ -161,7 +152,8 @@ Limitacions: l'ordinador ha d'estar encès; el mòbil només hi arriba des de ca
 | `npm run typecheck` / `lint` | TypeScript i ESLint |
 | `npm run db:start` / `db:reset` | Supabase local; `db:reset` torna a aplicar migracions i seed |
 | `npm run db:types` | Regenera `lib/supabase/database.types.ts` |
-| `npm run seed:generate` | Regenera `supabase/seed.sql` i les captures de `public/seed/` |
+| `npm run seed:generate` | Regenera `supabase/seed.sql`, les captures de `public/seed/` i `supabase/DADES-EXEMPLE.sql` |
+| `npm run db:setup-sql` | Regenera `supabase/INSTAL·LAR.sql` i `supabase/DADES-EXEMPLE.sql` a partir de les migracions i el seed (cal fer-ho després de canviar una migració; `npm test` falla si no estan al dia) |
 | `npm run docs:generate` | Regenera `API.md` i `CLAUDE_INSTRUCTIONS.md` |
 | `npm run apikey:create -- "nom"` | Crea una clau d'API des de la terminal |
 

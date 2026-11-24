@@ -8,7 +8,7 @@ import { db, must } from "@/lib/supabase/server";
  */
 export async function ensureBootstrap(): Promise<void> {
   const existing = await db().from("settings").select("id").eq("id", 1).maybeSingle();
-  if (existing.error) throw new Error(`No es pot llegir la configuració: ${existing.error.message}. Has executat 1-estructura.sql a Supabase?`);
+  if (existing.error) throw new Error(`No es pot llegir la configuració: ${existing.error.message}. Has executat supabase/INSTAL·LAR.sql al SQL Editor de Supabase?`);
   if (existing.data) return;
 
   let account = (await db().from("accounts").select("id").eq("is_default", true).maybeSingle()).data;

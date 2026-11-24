@@ -1,81 +1,144 @@
 -- ╔══════════════════════════════════════════════════════════════════════╗
--- ║ TradeLab · REPARAR                                                     ║
--- ║ Crea NOMÉS el que falti (taules, vistes, tipus, permisos, bucket).     ║
--- ║ No esborra res: ni les teves operacions ni la configuració.            ║
--- ║ Les taules/vistes amb el mateix nom que no són de TradeLab s'aparten   ║
--- ║ canviant-los el nom. Es pot executar tantes vegades com calgui.        ║
--- ║ Al final mostra un resum: tot ha de sortir OK.                         ║
+-- ║ TradeLab · INSTAL·LAR                                                  ║
+-- ║ L'ÚNIC fitxer que cal per preparar la base de dades a Supabase:        ║
+-- ║ SQL Editor → New query → enganxa tot aquest fitxer → Run.              ║
+-- ║                                                                        ║
+-- ║ · Crea NOMÉS el que falti (tipus, taules, índexs, vistes, triggers,    ║
+-- ║   RLS, permisos i el bucket "media").                                  ║
+-- ║ · No esborra res: ni les teves operacions ni la configuració.          ║
+-- ║ · Si hi ha taules o vistes amb el mateix nom que no són de TradeLab,   ║
+-- ║   les reanomena a <nom>_antiga.                                        ║
+-- ║ · Es pot executar tantes vegades com calgui (també per reparar una     ║
+-- ║   instal·lació a mitges o després d'actualitzar TradeLab).             ║
+-- ║ · Al final mostra un resum: totes les files han de dir OK.             ║
+-- ║                                                                        ║
+-- ║ Generat per scripts/generate-setup-sql.ts a partir de                  ║
+-- ║ supabase/migrations/. No l'editis a mà: npm run db:setup-sql           ║
 -- ╚══════════════════════════════════════════════════════════════════════╝
 
--- ── Pas 1: protegeix taules que NO són de TradeLab però tenen el mateix nom ──
-do $$
-declare r record; nou text;
-begin
-  for r in select * from (values
-    ('accounts','initial_capital'),
-    ('assets','symbol'),
-    ('strategies','description_md'),
-    ('strategy_rules','strategy_id'),
-    ('analyses','content_md'),
-    ('trades','capital_at_entry'),
-    ('trade_rule_checks','rule_id'),
-    ('tags','kind'),
-    ('trade_tags','tag_id'),
-    ('market_reports','report_date'),
-    ('concepts','slug'),
-    ('concept_examples','concept_id'),
-    ('media','thumb_url'),
-    ('goals','manual_progress'),
-    ('practice_attempts','answer_bias'),
-    ('settings','default_risk_pct'),
-    ('api_keys','key_hash'),
-    ('idempotency_keys','request_hash')
-  ) as x(taula, columna) loop
-    if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = r.taula and table_type = 'BASE TABLE')
-       and not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = r.taula and column_name = r.columna) then
-      nou := r.taula || '_antiga';
-      if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = nou) then
-        nou := nou || '_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
-      end if;
-      execute format('alter table public.%I rename to %I', r.taula, nou);
-      raise notice 'Taula % no era de TradeLab: reanomenada a %', r.taula, nou;
-    end if;
-  end loop;
-  -- settings de TradeLab ha de tenir també la columna id
-  if exists (select 1 from information_schema.tables where table_schema='public' and table_name='settings')
-     and not exists (select 1 from information_schema.columns where table_schema='public' and table_name='settings' and column_name='id') then
-    execute format('alter table public.settings rename to %I', 'settings_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS'));
-  end if;
-end $$;
-
-
--- ── settings que no sigui de TradeLab (taula o vista) ──
+-- ── Pas 1: aparta el que té el nom d'un objecte de TradeLab però no n'és ──
+-- (taules d'una altra aplicació, una taula on hi hauria d'anar una vista…)
+-- No s'esborra res: es reanomena a <nom>_antiga.
 do $$
 declare
+  r record;
   k "char";
-  nou text := 'settings_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+  nou text;
+  falten integer;
 begin
-  select c.relkind into k from pg_class c join pg_namespace n on n.oid = c.relnamespace
-   where n.nspname = 'public' and c.relname = 'settings';
-  if k is not null and not exists (
-      select 1 from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace n on n.oid = c.relnamespace
-       where n.nspname = 'public' and c.relname = 'settings' and a.attname = 'default_risk_pct' and not a.attisdropped)
-     or (k is not null and not exists (
-      select 1 from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace n on n.oid = c.relnamespace
-       where n.nspname = 'public' and c.relname = 'settings' and a.attname = 'id' and not a.attisdropped)) then
-    if k = 'v' then execute format('alter view public.settings rename to %I', nou);
-    elsif k = 'm' then execute format('alter materialized view public.settings rename to %I', nou);
-    elsif k = 'f' then execute format('alter foreign table public.settings rename to %I', nou);
-    else execute format('alter table public.settings rename to %I', nou);
+  -- Taules i vistes
+  for r in select * from (values
+    ('accounts', 'taula', array['id', 'name', 'type', 'initial_capital', 'currency', 'is_default', 'created_at', 'updated_at']::text[]),
+    ('assets', 'taula', array['id', 'symbol', 'type', 'is_favorite', 'created_at', 'updated_at']::text[]),
+    ('strategies', 'taula', array['id', 'name', 'version', 'description_md', 'timeframes', 'indicators', 'is_active', 'created_at', 'updated_at']::text[]),
+    ('strategy_rules', 'taula', array['id', 'strategy_id', 'text', 'sort_order', 'is_required', 'created_at', 'updated_at']::text[]),
+    ('analyses', 'taula', array['id', 'asset_id', 'title', 'timeframes', 'bias', 'levels', 'content_md', 'scenario', 'outcome', 'review_at', 'reviewed_at', 'my_notes', 'questions', 'source', 'analyzed_at', 'created_at', 'updated_at']::text[]),
+    ('trades', 'taula', array['id', 'account_id', 'asset_id', 'strategy_id', 'analysis_id', 'direction', 'status', 'entry_at', 'exit_at', 'entry_price', 'stop_loss', 'take_profit', 'exit_price', 'quantity', 'leverage', 'fees', 'capital_at_entry', 'bias_1h', 'confirmation_5m', 'trigger_1m', 'setup', 'emotion_before', 'emotion_after', 'notes', 'lesson', 'source', 'created_at', 'updated_at']::text[]),
+    ('trade_rule_checks', 'taula', array['trade_id', 'rule_id', 'passed', 'created_at', 'updated_at']::text[]),
+    ('tags', 'taula', array['id', 'name', 'kind', 'color', 'created_at', 'updated_at']::text[]),
+    ('trade_tags', 'taula', array['trade_id', 'tag_id', 'created_at']::text[]),
+    ('market_reports', 'taula', array['id', 'type', 'title', 'summary', 'content_md', 'report_date', 'btc_bias', 'eth_bias', 'watchlist', 'is_read', 'source', 'idempotency_key', 'created_at', 'updated_at']::text[]),
+    ('concepts', 'taula', array['id', 'slug', 'title', 'category', 'summary', 'content_md', 'status', 'sort_order', 'created_at', 'updated_at']::text[]),
+    ('concept_examples', 'taula', array['id', 'concept_id', 'analysis_id', 'trade_id', 'note', 'created_at', 'updated_at']::text[]),
+    ('media', 'taula', array['id', 'entity_type', 'entity_id', 'kind', 'url', 'thumb_url', 'storage_path', 'mime_type', 'width', 'height', 'size_bytes', 'caption', 'sort_order', 'created_at', 'updated_at']::text[]),
+    ('goals', 'taula', array['id', 'title', 'kind', 'target', 'manual_progress', 'starts_on', 'deadline', 'achieved_at', 'created_at', 'updated_at']::text[]),
+    ('practice_attempts', 'taula', array['id', 'analysis_id', 'trade_id', 'answer_bias', 'answer_stop', 'bias_correct', 'created_at', 'updated_at']::text[]),
+    ('settings', 'taula', array['id', 'default_account_id', 'currency', 'default_risk_pct', 'risk_warning_pct', 'max_daily_loss', 'max_weekly_loss', 'max_trades_per_day', 'timezone', 'locale', 'created_at', 'updated_at']::text[]),
+    ('api_keys', 'taula', array['id', 'name', 'prefix', 'key_hash', 'last_used_at', 'revoked_at', 'created_at', 'updated_at']::text[]),
+    ('idempotency_keys', 'taula', array['key', 'scope', 'request_hash', 'status_code', 'response', 'created_at']::text[]),
+    ('v_trade_metrics', 'vista', null::text[]),
+    ('v_daily_pnl', 'vista', null::text[]),
+    ('v_account_balance', 'vista', null::text[]),
+    ('v_tag_stats', 'vista', null::text[]),
+    ('v_rule_stats', 'vista', null::text[])
+  ) as x(nom, tipus, columnes) loop
+    select c.relkind into k from pg_class c join pg_namespace n on n.oid = c.relnamespace
+     where n.nspname = 'public' and c.relname = r.nom;
+    continue when k is null;
+    if r.tipus = 'vista' and k = 'v' then continue; end if;
+    if r.tipus = 'taula' and k in ('r', 'p') then
+      select count(*) into falten from unnest(r.columnes) as col(nom)
+       where not exists (select 1 from pg_attribute a
+                          where a.attrelid = format('public.%I', r.nom)::regclass
+                            and a.attname = col.nom and a.attnum > 0 and not a.attisdropped);
+      continue when falten = 0;
     end if;
-    raise notice 'settings antiga apartada com a %', nou;
-  end if;
+    nou := r.nom || '_antiga';
+    if to_regclass(format('public.%I', nou)) is not null then
+      nou := nou || '_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+    end if;
+    case k
+      when 'r', 'p' then execute format('alter table public.%I rename to %I', r.nom, nou);
+      when 'v' then execute format('alter view public.%I rename to %I', r.nom, nou);
+      when 'm' then execute format('alter materialized view public.%I rename to %I', r.nom, nou);
+      when 'f' then execute format('alter foreign table public.%I rename to %I', r.nom, nou);
+      when 'S' then execute format('alter sequence public.%I rename to %I', r.nom, nou);
+      when 'i', 'I' then execute format('alter index public.%I rename to %I', r.nom, nou);
+      else raise exception 'Hi ha un objecte "%" (tipus %) que no és de TradeLab. Canvia-li el nom i torna-ho a executar.', r.nom, k;
+    end case;
+    raise notice '"%" no era de TradeLab: reanomenat a "%"', r.nom, nou;
+  end loop;
+
+  -- Tipus enumerats amb el mateix nom però uns altres valors
+  for r in select * from (values
+    ('account_type', array['paper', 'real']::text[]),
+    ('trade_direction', array['long', 'short']::text[]),
+    ('trade_status', array['planned', 'open', 'closed', 'cancelled']::text[]),
+    ('market_bias', array['bullish', 'bearish', 'neutral']::text[]),
+    ('analysis_outcome', array['pending', 'fulfilled', 'partial', 'failed']::text[]),
+    ('content_source', array['claude', 'manual', 'scheduled']::text[]),
+    ('media_kind', array['before', 'during', 'after', 'analysis', 'report', 'example']::text[]),
+    ('media_entity', array['trade', 'analysis', 'market_report', 'concept']::text[]),
+    ('tag_kind', array['error', 'emotion', 'setup']::text[]),
+    ('report_type', array['daily', 'weekly', 'adhoc']::text[]),
+    ('concept_status', array['pending', 'learning', 'mastered']::text[]),
+    ('goal_kind', array['journal_streak', 'winning_trades', 'trades_count', 'net_pnl', 'win_rate', 'custom']::text[])
+  ) as x(nom, valors) loop
+    continue when not exists (select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace
+                               where n.nspname = 'public' and t.typname = r.nom);
+    continue when exists (select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace
+                           where n.nspname = 'public' and t.typname = r.nom and t.typtype = 'e'
+                             and r.valors <@ array(select e.enumlabel::text from pg_enum e where e.enumtypid = t.oid));
+    nou := r.nom || '_antiga';
+    if exists (select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace where n.nspname = 'public' and t.typname = nou) then
+      nou := nou || '_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+    end if;
+    execute format('alter type public.%I rename to %I', r.nom, nou);
+    raise notice 'Tipus "%" no era de TradeLab: reanomenat a "%"', r.nom, nou;
+  end loop;
+
+  -- Índexs amb el nostre nom però sobre una altra taula (p. ex. d'una taula apartada)
+  for r in select * from (values
+    ('accounts_one_default', 'accounts'),
+    ('strategies_one_active', 'strategies'),
+    ('strategy_rules_strategy', 'strategy_rules'),
+    ('analyses_asset_date', 'analyses'),
+    ('trades_status_exit', 'trades'),
+    ('trades_asset', 'trades'),
+    ('market_reports_date', 'market_reports'),
+    ('media_entity', 'media')
+  ) as x(nom, taula) loop
+    continue when not exists (select 1 from pg_class ix join pg_namespace n on n.oid = ix.relnamespace
+                               where n.nspname = 'public' and ix.relname = r.nom);
+    continue when exists (select 1 from pg_index i
+                            join pg_class ix on ix.oid = i.indexrelid
+                            join pg_class t on t.oid = i.indrelid
+                            join pg_namespace n on n.oid = ix.relnamespace
+                           where n.nspname = 'public' and ix.relname = r.nom and t.relname = r.taula);
+    nou := r.nom || '_antic';
+    if to_regclass(format('public.%I', nou)) is not null then
+      nou := nou || '_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+    end if;
+    execute format('alter index public.%I rename to %I', r.nom, nou);
+    raise notice 'Índex "%" no era de TradeLab: reanomenat a "%"', r.nom, nou;
+  end loop;
 end $$;
 
-
--- ── Estructura (idempotent) ──
--- Les vistes no guarden dades: es recreen sempre
+-- ── Pas 2: estructura (idempotent) ──
+-- Les vistes no guarden dades: s'esborren i es tornen a crear.
 drop view if exists public.v_rule_stats, public.v_tag_stats, public.v_account_balance, public.v_daily_pnl, public.v_trade_metrics cascade;
+
+-- ─────────── 20261121000001_schema.sql ───────────
 -- TradeLab · esquema inicial
 -- Plataforma d'un sol usuari, sense login: tot l'accés a la BD es fa des del
 -- servidor amb la service role key. RLS està activat a totes les taules SENSE
@@ -392,6 +455,7 @@ begin
   end loop;
 end $$;
 
+-- ─────────── 20261121000002_views.sql ───────────
 -- TradeLab · vistes de càlcul
 -- Font única de veritat per a les mètriques per operació. Les mateixes
 -- fórmules estan replicades (i testejades) a lib/finance per a la calculadora
@@ -515,6 +579,7 @@ group by r.id, c.passed;
 
 revoke all on v_trade_metrics, v_daily_pnl, v_account_balance, v_tag_stats, v_rule_stats from anon, authenticated;
 
+-- ─────────── 20261121000003_storage.sql ───────────
 -- Bucket per a les captures. És públic de lectura perquè les imatges es
 -- puguin mostrar amb <img>; els noms són UUID aleatoris i no es poden llistar
 -- sense la service role. Només el servidor hi pot escriure.
@@ -525,6 +590,7 @@ on conflict (id) do update set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+-- ─────────── 20261121000004_grants.sql ───────────
 -- Permisos explícits per a la clau de servidor (service_role).
 -- Alguns projectes nous de Supabase no els donen automàticament a les taules creades per SQL.
 grant usage on schema public to service_role;
@@ -534,24 +600,35 @@ grant all on all routines in schema public to service_role;
 alter default privileges in schema public grant all on tables to service_role;
 alter default privileges in schema public grant all on sequences to service_role;
 
--- ── Configuració inicial si falta ──
+-- ── Configuració inicial si falta (no toca la que ja tinguis) ──
 insert into public.accounts (name, type, initial_capital, currency, is_default)
-select 'Paper TradingView', 'paper', 202, 'EUR', true
+select 'Paper TradingView', 'paper', 150, 'EUR', true
 where not exists (select 1 from public.accounts where is_default);
+
 insert into public.settings (id, default_account_id, currency, default_risk_pct, risk_warning_pct, max_daily_loss, max_weekly_loss, max_trades_per_day)
-select 1, (select id from public.accounts where is_default limit 1), 'EUR', 2, 2, 9, 20, 4
+select 1, (select id from public.accounts where is_default limit 1), 'EUR', 3, 2, 9, 20, 4
 on conflict (id) do nothing;
-update public.settings set default_account_id = (select id from public.accounts where is_default limit 1) where default_account_id is null;
+
+update public.settings
+   set default_account_id = (select id from public.accounts where is_default limit 1)
+ where default_account_id is null;
 
 notify pgrst, 'reload schema';
 
--- ── Resum ──
-select 'Taules (han de ser 18)' as comprovacio,
-       (select count(*) from information_schema.tables where table_schema='public' and table_type='BASE TABLE' and table_name in
-        ('accounts','assets','strategies','strategy_rules','analyses','trades','trade_rule_checks','tags','trade_tags','market_reports','concepts',
-         'concept_examples','media','goals','practice_attempts','settings','api_keys','idempotency_keys'))::text as valor
-union all select 'Vistes (han de ser 5)', (select count(*) from information_schema.views where table_schema='public' and table_name in
-        ('v_trade_metrics','v_daily_pnl','v_account_balance','v_tag_stats','v_rule_stats'))::text
-union all select 'Bucket de captures', (select count(*) from storage.buckets where id='media')::text
-union all select 'Configuració', (select count(*) from public.settings)::text
-union all select 'Capital actual', (select current_capital::text from public.v_account_balance where account_id = (select default_account_id from public.settings where id=1));
+-- ── Resum: totes les files han de dir OK ──
+select comprovacio, valor, esperat, case when valor = esperat or (esperat is null and valor is not null) then 'OK' else 'REVISA' end as estat
+from (
+  select 1 as ordre, 'Taules' as comprovacio, (select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace
+       where n.nspname = 'public' and c.relkind in ('r', 'p') and c.relname in ('accounts', 'assets', 'strategies', 'strategy_rules', 'analyses', 'trades', 'trade_rule_checks', 'tags', 'trade_tags', 'market_reports', 'concepts', 'concept_examples', 'media', 'goals', 'practice_attempts', 'settings', 'api_keys', 'idempotency_keys'))::text as valor, '18' as esperat
+  union all
+  select 2, 'Vistes', (select count(*) from pg_class c join pg_namespace n on n.oid = c.relnamespace
+       where n.nspname = 'public' and c.relkind in ('v') and c.relname in ('v_trade_metrics', 'v_daily_pnl', 'v_account_balance', 'v_tag_stats', 'v_rule_stats'))::text, '5'
+  union all
+  select 3, 'Bucket de captures', (select count(*) from storage.buckets where id = 'media')::text, '1'
+  union all
+  select 4, 'Configuració', (select count(*) from public.settings)::text, '1'
+  union all
+  select 5, 'Capital actual', (select current_capital || ' ' || currency from public.v_account_balance
+                                where account_id = (select default_account_id from public.settings where id = 1)), null
+) as resum
+order by ordre;
