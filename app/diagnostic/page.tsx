@@ -1,6 +1,16 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { getDashboard, getMonthCalendar, getPerformanceReport } from "@/features/performance/service";
+import { getDefaultAccount, getSettings, listAssets } from "@/features/settings/queries";
+import { listTrades } from "@/features/trades/queries";
+import { disciplineState } from "@/features/trades/service";
+import { getLatestAnalysis, getLatestReport } from "@/features/dashboard/queries";
+import { getStrategyOverview } from "@/features/strategy/queries";
+import { listAnalyses } from "@/features/analyses/service";
+import { listMarketReports } from "@/features/market-reports/service";
+import { errorReview, listConcepts, listGoalsWithProgress, nextPracticeQuestion } from "@/features/learning/service";
+import { localDate } from "@/lib/time";
 
 export const metadata = { title: "Diagnòstic" };
 
@@ -58,6 +68,40 @@ async function Checks() {
     }
   }
 
+  // Les mateixes consultes que fan les pàgines: si alguna falla, en veiem el missatge real
+  if (checks.every((c) => c.ok)) {
+    const today = localDate(new Date());
+    const app: [string, () => Promise<unknown>][] = [
+      ["App · configuració", () => getSettings()],
+      ["App · compte i capital", () => getDefaultAccount()],
+      ["App · dashboard (mes)", () => getDashboard("month")],
+      ["App · dashboard (dia)", () => getDashboard("day")],
+      ["App · dashboard (tot)", () => getDashboard("all")],
+      ["App · calendari", () => getMonthCalendar(today.slice(0, 7))],
+      ["App · disciplina", async () => disciplineState((await getDefaultAccount()).id)],
+      ["App · darreres operacions", () => listTrades({ limit: 6 })],
+      ["App · darrera anàlisi", () => getLatestAnalysis()],
+      ["App · darrer informe", () => getLatestReport()],
+      ["App · actius", () => listAssets()],
+      ["App · estratègia", () => getStrategyOverview()],
+      ["App · rendiment setmanal", () => getPerformanceReport("weekly")],
+      ["App · anàlisis", () => listAnalyses({ limit: 5 })],
+      ["App · informes de mercat", () => listMarketReports({ limit: 5 })],
+      ["App · conceptes", () => listConcepts()],
+      ["App · objectius", () => listGoalsWithProgress()],
+      ["App · errors", () => errorReview()],
+      ["App · pràctica", () => nextPracticeQuestion()],
+    ];
+    for (const [name, run] of app) {
+      try {
+        await run();
+        checks.push({ name, ok: true, detail: "D'acord." });
+      } catch (e) {
+        checks.push({ name, ok: false, detail: e instanceof Error ? `${e.message}${e.stack ? `\n${e.stack.split("\n").slice(1, 3).join(" ")}` : ""}` : String(e) });
+      }
+    }
+  }
+
   const allOk = checks.every((c) => c.ok);
   return (
     <>
@@ -66,7 +110,7 @@ async function Checks() {
         {checks.map((c) => (
           <li key={c.name} style={{ padding: "10px 0", borderBottom: "1px solid #1e293b" }}>
             <strong style={{ color: c.ok ? "#10b981" : "#ef4444" }}>{c.ok ? "✓" : "✗"} {c.name}</strong>
-            <div style={{ color: "#94a3b8", fontSize: 14, marginTop: 4, wordBreak: "break-word" }}>{c.detail}</div>
+            <div style={{ color: "#94a3b8", fontSize: 14, marginTop: 4, wordBreak: "break-word", whiteSpace: "pre-wrap" }}>{c.detail}</div>
           </li>
         ))}
       </ul>
