@@ -22,7 +22,7 @@ export async function proxy(req: NextRequest) {
 
   const given = req.nextUrl.searchParams.get("acces");
   if (given) {
-    if ((await sha256(`tradelab:${given}`)) !== expected) return denied();
+    if ((await sha256(`tradelab:${given.trim()}`)) !== expected) return denied(true);
     const clean = req.nextUrl.clone();
     clean.searchParams.delete("acces");
     const res = NextResponse.redirect(clean);
@@ -34,13 +34,19 @@ export async function proxy(req: NextRequest) {
   return denied();
 }
 
-function denied() {
+function denied(wrong = false) {
   return new NextResponse(
-    `<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TradeLab</title>
-<style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#05070d;color:#e5e7eb;font-family:system-ui,sans-serif}
-div{max-width:420px;padding:32px;border:1px solid #1e293b;border-radius:16px;background:#111827;text-align:center}
-h1{font-size:18px;margin:0 0 8px}p{color:#94a3b8;font-size:14px;line-height:1.6;margin:0}</style></head>
-<body><div><h1>Accés restringit</h1><p>Obre l'enllaç d'accés de TradeLab en aquest dispositiu (una sola vegada) per entrar.</p></div></body></html>`,
+    `<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070d"><title>TradeLab</title>
+<style>body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#05070d;color:#e5e7eb;font-family:system-ui,-apple-system,sans-serif;padding:16px;box-sizing:border-box}
+div{width:100%;max-width:400px;padding:28px;border:1px solid #1e293b;border-radius:18px;background:#111827;text-align:center;box-sizing:border-box}
+h1{font-size:19px;margin:0 0 8px}p{color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 18px}
+input{width:100%;box-sizing:border-box;height:48px;border-radius:12px;border:1px solid ${wrong ? "#ef4444" : "#2a3a52"};background:#0b0f1a;color:#e5e7eb;font-size:16px;padding:0 14px;outline:none}
+input:focus{border-color:#3b82f6}button{margin-top:12px;width:100%;height:48px;border:0;border-radius:12px;background:#2563eb;color:#fff;font-size:16px;font-weight:600}
+.err{color:#ef4444;font-size:13px;margin:8px 0 0}</style></head>
+<body><div><h1>Accés restringit</h1><p>Escriu el teu codi d'accés (el valor d'APP_ACCESS_TOKEN). Només cal fer-ho una vegada en aquest dispositiu o app.</p>
+<form method="get" action="/"><input name="acces" type="password" autocomplete="current-password" placeholder="Codi d'accés" required autofocus>
+${wrong ? '<p class="err">Codi incorrecte. Torna-ho a provar.</p>' : ""}<button type="submit">Entrar</button></form></div></body></html>`,
     { status: 401, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } },
   );
 }
