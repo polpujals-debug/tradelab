@@ -7,71 +7,51 @@
 -- ║ Al final mostra un resum: tot ha de sortir OK.                         ║
 -- ╚══════════════════════════════════════════════════════════════════════╝
 
--- ── Pas 1: protegeix taules que NO són de TradeLab però tenen el mateix nom ──
+-- ── Pas 1: cada taula amb nom de TradeLab ha de tenir TOTES les columnes correctes ──
+-- Si no quadra: buida → es torna a crear; amb dades → s'aparta com a <nom>_antiga (no s'esborra).
 do $$
-declare r record; nou text;
+declare r record; k "char"; falten int; files bigint; nou text;
 begin
   for r in select * from (values
-    ('accounts','initial_capital'),
-    ('assets','symbol'),
-    ('strategies','description_md'),
-    ('strategy_rules','strategy_id'),
-    ('analyses','content_md'),
-    ('trades','capital_at_entry'),
-    ('trade_rule_checks','rule_id'),
-    ('tags','kind'),
-    ('trade_tags','tag_id'),
-    ('market_reports','report_date'),
-    ('concepts','slug'),
-    ('concept_examples','concept_id'),
-    ('media','thumb_url'),
-    ('goals','manual_progress'),
-    ('practice_attempts','answer_bias'),
-    ('settings','default_risk_pct'),
-    ('api_keys','key_hash'),
-    ('idempotency_keys','request_hash')
-  ) as x(taula, columna) loop
-    if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = r.taula and table_type = 'BASE TABLE')
-       and not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = r.taula and column_name = r.columna) then
-      nou := r.taula || '_antiga';
-      if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = nou) then
-        nou := nou || '_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+    ('accounts', array['id','name','type','initial_capital','currency','is_default','created_at','updated_at']),
+    ('analyses', array['id','asset_id','title','timeframes','bias','levels','content_md','scenario','outcome','review_at','reviewed_at','my_notes','questions','source','analyzed_at','created_at','updated_at']),
+    ('api_keys', array['id','name','prefix','key_hash','last_used_at','revoked_at','created_at','updated_at']),
+    ('assets', array['id','symbol','type','is_favorite','created_at','updated_at']),
+    ('concept_examples', array['id','concept_id','analysis_id','trade_id','note','created_at','updated_at']),
+    ('concepts', array['id','slug','title','category','summary','content_md','status','sort_order','created_at','updated_at']),
+    ('goals', array['id','title','kind','target','manual_progress','starts_on','deadline','achieved_at','created_at','updated_at']),
+    ('idempotency_keys', array['key','scope','request_hash','status_code','response','created_at']),
+    ('market_reports', array['id','type','title','summary','content_md','report_date','btc_bias','eth_bias','watchlist','is_read','source','idempotency_key','created_at','updated_at']),
+    ('media', array['id','entity_type','entity_id','kind','url','thumb_url','storage_path','mime_type','width','height','size_bytes','caption','sort_order','created_at','updated_at']),
+    ('practice_attempts', array['id','analysis_id','trade_id','answer_bias','answer_stop','bias_correct','created_at','updated_at']),
+    ('settings', array['id','default_account_id','currency','default_risk_pct','risk_warning_pct','max_daily_loss','max_weekly_loss','max_trades_per_day','timezone','locale','created_at','updated_at']),
+    ('strategies', array['id','name','version','description_md','timeframes','indicators','is_active','created_at','updated_at']),
+    ('strategy_rules', array['id','strategy_id','text','sort_order','is_required','created_at','updated_at']),
+    ('tags', array['id','name','kind','color','created_at','updated_at']),
+    ('trade_rule_checks', array['trade_id','rule_id','passed','created_at','updated_at']),
+    ('trade_tags', array['trade_id','tag_id','created_at']),
+    ('trades', array['id','account_id','asset_id','strategy_id','analysis_id','direction','status','entry_at','exit_at','entry_price','stop_loss','take_profit','exit_price','quantity','leverage','fees','capital_at_entry','bias_1h','confirmation_5m','trigger_1m','setup','emotion_before','emotion_after','notes','lesson','source','created_at','updated_at'])
+  ) as x(taula, cols) loop
+    select c.relkind into k from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relname = r.taula;
+    if k is null then continue; end if;
+    select count(*) into falten from unnest(r.cols) col
+     where not exists (select 1 from information_schema.columns ic where ic.table_schema = 'public' and ic.table_name = r.taula and ic.column_name = col);
+    if k = 'r' and falten = 0 then continue; end if;
+    files := 0;
+    if k = 'r' then execute format('select count(*) from public.%I', r.taula) into files; end if;
+    if k = 'r' and files = 0 then
+      execute format('drop table public.%I cascade', r.taula);
+      raise notice 'Taula % no quadrava i era buida: es tornarà a crear', r.taula;
+    else
+      nou := r.taula || '_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
+      if k = 'v' then execute format('alter view public.%I rename to %I', r.taula, nou);
+      elsif k = 'm' then execute format('alter materialized view public.%I rename to %I', r.taula, nou);
+      else execute format('alter table public.%I rename to %I', r.taula, nou);
       end if;
-      execute format('alter table public.%I rename to %I', r.taula, nou);
-      raise notice 'Taula % no era de TradeLab: reanomenada a %', r.taula, nou;
+      raise notice 'Taula % no quadrava (% columnes diferents, % files): apartada com a %', r.taula, falten, files, nou;
     end if;
   end loop;
-  -- settings de TradeLab ha de tenir també la columna id
-  if exists (select 1 from information_schema.tables where table_schema='public' and table_name='settings')
-     and not exists (select 1 from information_schema.columns where table_schema='public' and table_name='settings' and column_name='id') then
-    execute format('alter table public.settings rename to %I', 'settings_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS'));
-  end if;
 end $$;
-
-
--- ── settings que no sigui de TradeLab (taula o vista) ──
-do $$
-declare
-  k "char";
-  nou text := 'settings_antiga_' || to_char(clock_timestamp(), 'YYYYMMDDHH24MISS');
-begin
-  select c.relkind into k from pg_class c join pg_namespace n on n.oid = c.relnamespace
-   where n.nspname = 'public' and c.relname = 'settings';
-  if k is not null and not exists (
-      select 1 from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace n on n.oid = c.relnamespace
-       where n.nspname = 'public' and c.relname = 'settings' and a.attname = 'default_risk_pct' and not a.attisdropped)
-     or (k is not null and not exists (
-      select 1 from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace n on n.oid = c.relnamespace
-       where n.nspname = 'public' and c.relname = 'settings' and a.attname = 'id' and not a.attisdropped)) then
-    if k = 'v' then execute format('alter view public.settings rename to %I', nou);
-    elsif k = 'm' then execute format('alter materialized view public.settings rename to %I', nou);
-    elsif k = 'f' then execute format('alter foreign table public.settings rename to %I', nou);
-    else execute format('alter table public.settings rename to %I', nou);
-    end if;
-    raise notice 'settings antiga apartada com a %', nou;
-  end if;
-end $$;
-
 
 -- ── Estructura (idempotent) ──
 -- Les vistes no guarden dades: es recreen sempre
