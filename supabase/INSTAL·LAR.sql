@@ -602,7 +602,7 @@ alter default privileges in schema public grant all on sequences to service_role
 
 -- ── Configuració inicial si falta (no toca la que ja tinguis) ──
 insert into public.accounts (name, type, initial_capital, currency, is_default)
-select 'Paper TradingView', 'paper', 150, 'EUR', true
+select 'Paper TradingView', 'paper', 200, 'EUR', true
 where not exists (select 1 from public.accounts where is_default);
 
 insert into public.settings (id, default_account_id, currency, default_risk_pct, risk_warning_pct, max_daily_loss, max_weekly_loss, max_trades_per_day)

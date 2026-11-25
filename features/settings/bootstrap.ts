@@ -3,7 +3,7 @@ import { db, must } from "@/lib/supabase/server";
 
 /**
  * Configuració inicial mínima si la base de dades està buida (per exemple, si no s'ha
- * executat el seed): compte de paper de 150 €, configuració, estratègia v1 amb la
+ * executat el seed): compte de paper de 200 €, configuració, estratègia v1 amb la
  * checklist i les etiquetes bàsiques. És idempotent.
  */
 export async function ensureBootstrap(): Promise<void> {
@@ -13,7 +13,7 @@ export async function ensureBootstrap(): Promise<void> {
 
   let account = (await db().from("accounts").select("id").eq("is_default", true).maybeSingle()).data;
   if (!account) {
-    account = must(await db().from("accounts").insert({ name: "Paper TradingView", type: "paper", initial_capital: 150, currency: "EUR", is_default: true }).select("id").single(), "Crear compte");
+    account = must(await db().from("accounts").insert({ name: "Paper TradingView", type: "paper", initial_capital: 200, currency: "EUR", is_default: true }).select("id").single(), "Crear compte");
   }
   await db().from("settings").upsert({ id: 1, default_account_id: account.id, currency: "EUR", default_risk_pct: 3, risk_warning_pct: 2, max_daily_loss: 9, max_weekly_loss: 20, max_trades_per_day: 4 }, { onConflict: "id", ignoreDuplicates: true });
 

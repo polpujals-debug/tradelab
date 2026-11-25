@@ -10,6 +10,6 @@ delete from analyses;
 delete from market_reports;
 delete from goals;
 delete from idempotency_keys;
--- Capital inicial de referència: 150 €
-update accounts set initial_capital = 150 where is_default;
+-- Capital inicial de referència: 200 €
+update accounts set initial_capital = 200 where is_default;
 commit;
